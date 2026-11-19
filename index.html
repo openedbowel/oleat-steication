@@ -780,7 +780,9 @@ var CFG = {
     };
     var R = {
       arr: [[-8, 296], [-8, 238], [-8, 163], [-10, 94], [-13, 59], [-113, 62], [-199, 65], [-197, 27], [-190, 5]],
-      gl5: [[-190, 5], [-196, 18], [-156, 19], [-135, 15], [-130, 10]],
+      gl5: [[-190, 5], [-196, 18], [-156, 19], [-135, 15], [-132, -6], [-96, -6]],
+      gl5T: [[-190, 5], [-196, 18], [-156, 19], [-135, 15], [-133, -11], [-26, -11], [-24, 10]],
+      gl5S: [[-190, 5], [-196, 18], [-156, 19], [-138, 31], [-96, 31], [-96, 26]],
       ishOut: [[-96, 24], [-96, 42], [-87, 61], [-13, 59], [-10, 94], [-8, 163], [-8, 238], [-8, 296], [40, 306], [70, 322], [70, 345]],
       menVII: [[-28, 10], [-11, 10], [-11, -20], [-8, -41], [3, -41]],
       menVIII: [[-28, 10], [-11, 15], [1, 15], [100, 15], [100, 10]],
@@ -788,18 +790,21 @@ var CFG = {
       plzVIII: [[100, 10], [100, 15], [1, 15], [-11, 15], [-11, -20], [-16, -50]],
       pulang: [[-16, -50], [-11, -20], [-11, 15], [-13, 59], [-10, 94], [-8, 163], [-8, 238], [-8, 296]]
     };
+    var COL = { gl5T: [0xe07b39, '#e07b39', 'Barisan Timur · Multimedia (L2) + 7607 & 7608 · pintu ujung timur, tangga timur'],
+                gl5: [0x2f7fd1, '#2f7fd1', 'Barisan Utara · 7602 + 7609 & 7610 · lobi utara, tangga tengah'],
+                gl5S: [0x2f9e5b, '#2f9e5b', 'Barisan Selatan · 7601 (L1) + 7606 · lobi selatan, 7606 naik tangga tengah setelah Barisan Utara'] };
     function rev(a) { return a.slice().reverse(); }
     var steps = [
       ['07.00–08.30', 'Mobilisasi peserta ke ITB Ganesha', 'gkub', ['arr', 'gl5x'], 90, 'Operasional, Lapangan', 'Peserta berangkat dari Jatinangor; di Ganesha diarahkan dari titik kedatangan ke R. 9126 & 9125 (GKU Barat).', 'Mendampingi peserta selama perjalanan', 'Mengarahkan peserta dari titik kedatangan ke Ruang 9126 dan 9125', 'Ikut rombongan dan membawa P3K', 'Keberangkatan tetap berjalan', 'Peserta menunggu di titik kumpul beratap, keberangkatan menunggu arahan Acara', 1],
       ['08.30–08.40', 'Kedatangan & pengondisian', 'gkub', [], 10, 'MC, Lapangan', 'Peserta duduk berkelompok sesuai career path; Lapangan cek kehadiran.', 'Menjaga pintu ruangan', 'Mengarahkan ke kelompok career path', 'Berjaga', 'Acara di dalam ruangan', 'Peserta yang basah didata Medik', 0],
       ['08.40–08.55', 'Pretest', 'gkub', [], 15, 'Acara', 'Pretest di layar.', 'Menjaga ruangan kondusif', 'Membantu peserta membuka pretest', 'Berjaga', 'Di dalam ruangan', 'Di dalam ruangan', 0],
       ['08.55–10.25', 'Materi Git', 'gkub', [], 90, 'Acara', 'Dasar-dasar Git dengan hands on.', 'Menjaga & mencegah gangguan', 'Membantu peserta yang tertinggal', 'Berjaga', 'Di dalam ruangan', 'Di dalam ruangan', 0],
-      ['10.25–10.55', 'Mobilisasi ke ruang career path 1', 'l5', ['gl5'], 30, 'Lapangan', 'GKU Barat → Labtek V: 7601 (L1), R. Multimedia (L2), 7602, 7606, 7607 & 7608, 7609 & 7610 (L3). Arus naik tangga per ruang dihitung di model Labtek V.', 'Menjaga jalur mobilisasi', 'Berjaga di depan tiap ruangan', 'Berjalan di belakang rombongan', 'Mobilisasi tetap berjalan', 'Lewat koridor dan jalur teduh', 1],
+      ['10.25–10.55', 'Mobilisasi ke ruang career path 1', 'l5', ['gl5T', 'gl5', 'gl5S'], 30, 'Lapangan', 'GKU Barat → Labtek V: 7601 (L1), R. Multimedia (L2), 7602, 7606, 7607 & 7608, 7609 & 7610 (L3). Maks 2 kelas per barisan, dipecah jadi 3 barisan dengan alur berbeda: Timur (Multimedia + 7607 & 7608, pintu ujung timur, tangga timur), Utara (7602 + 7609 & 7610, lobi utara, tangga tengah), Selatan (7601 + 7606, lobi selatan; 7606 naik tangga tengah setelah Barisan Utara). Tangga barat TIDAK dipakai (jarang bisa diakses). Jadwal barisan ada di model Labtek V.', 'Menjaga jalur mobilisasi', 'Berjaga di depan tiap ruangan', 'Berjalan di belakang rombongan', 'Mobilisasi tetap berjalan', 'Lewat koridor dan jalur teduh', 1],
       ['10.55–11.55', 'Career path 1 + QnA', 'l5', [], 60, 'Acara', '6 career path: software engineer, data science, project manager, cyber security, UI/UX designer, game developer.', 'Menjaga & mencegah gangguan', 'Membantu peserta yang salah masuk ruangan', 'Berjaga', 'Di dalam ruangan', 'Di dalam ruangan', 0],
-      ['11.55–12.50', 'Ishoma (sporadis)', 'salman', ['ishOut'], 55, 'Acara, Lapangan', 'Istirahat, makan, ibadah. Asumsi: sholat di Masjid Salman (bisa juga musholla terdekat).', 'Berkeliling memantau area sporadis', 'Mengarahkan ke tempat makan & masjid/musholla', 'Standby di pos medik', 'Makan di area beratap', 'Peserta tetap di dalam gedung, pengondisian bisa mundur', 1],
-      ['12.50–13.10', 'Mobilisasi ke career path 2', 'l5', ['ishBack'], 20, 'Lapangan', 'Kembali ke Labtek V, pindah ke ruang career path berikutnya (arus dua arah di koridor & tangga).', 'Menjaga jalur mobilisasi', 'Berjaga di depan tiap ruangan', 'Berjalan di belakang rombongan', 'Mobilisasi tetap berjalan', 'Lewat koridor dan jalur teduh', 1],
+      ['11.55–12.50', 'Ishoma (sporadis)', 'salman', ['ishOut'], 55, 'Acara, Lapangan', 'Istirahat, makan, ibadah. Asumsi: sholat di Masjid Salman (bisa juga musholla terdekat). Keluar gedung per barisan (maks 2 kelas per barisan, 3 barisan lewat pintu berbeda), tanpa tangga barat.', 'Berkeliling memantau area sporadis', 'Mengarahkan ke tempat makan & masjid/musholla', 'Standby di pos medik', 'Makan di area beratap', 'Peserta tetap di dalam gedung, pengondisian bisa mundur', 1],
+      ['12.50–13.10', 'Mobilisasi ke career path 2', 'l5', ['ishBack'], 20, 'Lapangan', 'Kembali ke Labtek V, pindah ke ruang career path berikutnya (arus dua arah di koridor & tangga). Maks 2 kelas per barisan, dipecah jadi 3 barisan dengan alur berbeda: Timur (Multimedia + 7607 & 7608, pintu ujung timur, tangga timur), Utara (7602 + 7609 & 7610, lobi utara, tangga tengah), Selatan (7601 + 7606, lobi selatan; 7606 naik tangga tengah setelah Barisan Utara). Tangga barat TIDAK dipakai (jarang bisa diakses).', 'Menjaga jalur mobilisasi', 'Berjaga di depan tiap ruangan', 'Berjalan di belakang rombongan', 'Mobilisasi tetap berjalan', 'Lewat koridor dan jalur teduh', 1],
       ['13.10–14.10', 'Career path 2 + QnA', 'l5', [], 60, 'Acara', 'Pematerian & QnA career path 2.', 'Menjaga & mencegah gangguan', 'Membantu peserta yang salah masuk ruangan', 'Berjaga', 'Di dalam ruangan', 'Di dalam ruangan', 0],
-      ['14.10–14.25', 'Mobilisasi mentoring', 'selVII', ['menVII', 'menVIII'], 15, 'Mentor, Lapangan', 'Ke Selasar Labtek VII Barat & Labtek VIII Timur. Selasar Labtek VI TIDAK dipakai. Arus turun tangga dihitung di model Labtek V.', 'Menjaga Selasar Labtek VI tidak dipakai', 'Mengarahkan kelompok ke titik mentoring', 'Berjalan di belakang rombongan', 'Tetap berjalan dengan payung/ponco', 'Kelompok ke bagian selasar paling terlindung', 1],
+      ['14.10–14.25', 'Mobilisasi mentoring', 'selVII', ['menVII', 'menVIII'], 15, 'Mentor, Lapangan', 'Ke Selasar Labtek VII Barat & Labtek VIII Timur. Selasar Labtek VI TIDAK dipakai. Turun tangga per barisan, maks 2 kelas per barisan (3 barisan); tangga barat TIDAK dipakai (jarang bisa diakses), naik/turun lewat tangga tengah (hall) & tangga timur.', 'Menjaga Selasar Labtek VI tidak dipakai', 'Mengarahkan kelompok ke titik mentoring', 'Berjalan di belakang rombongan', 'Tetap berjalan dengan payung/ponco', 'Kelompok ke bagian selasar paling terlindung', 1],
       ['14.25–15.25', 'Mentoring + post-test', 'selVII', [], 60, 'Mentor', 'Mentoring prospek & pandangan karier, lalu post-test.', 'Menjaga & mencegah gangguan', 'Membantu peserta yang terpisah', 'Berkeliling ke titik mentoring', 'Bergeser ke bagian selasar beratap', 'Pindah ke ruangan/selasar beratap yang dikonfirmasi Operasional', 0],
       ['15.25–15.55', 'Sholat Ashar', 'selVII', ['ashar'], 30, 'Mentor, Lapangan', 'Ke musholla terdekat; peserta yang tidak sholat tetap bersama kelompok.', 'Menjaga area kelompok yang tidak sholat', 'Mengarahkan ke masjid/musholla terdekat', 'Berjaga', 'Memakai payung/ponco', 'Lewat jalur teduh, waktu menyesuaikan', 1],
       ['15.55–16.25', 'Mobilisasi ke Plaza Widya Nusantara', 'plaza', ['plzVII', 'plzVIII'], 30, 'Lapangan', 'Revisi rundown: games di Plaza Widya Nusantara (kolom keterangan rundown masih menulis Lapangan CC Timur; yang dipakai lokasi di kolom Tempat).', 'Menjaga jalur menuju Plaza Widya Nusantara', 'Menata posisi per kelompok', 'Berjalan di belakang rombongan', 'Tetap berjalan dengan payung/ponco', 'Mobilisasi ditahan, peserta menunggu di selasar', 1],
@@ -816,7 +821,7 @@ var CFG = {
     R.ashar = [LOC.selVII.slice(0, 2), [m1.x, m1.z]]; R.ashar2 = [LOC.selVIII.slice(0, 2), [m2.x, m2.z]];
     R.ishBack = rev(R.ishOut); R.gl5x = R.gl5;
     steps.forEach(function (st) { if (st[3].indexOf('ashar') >= 0) st[3] = ['ashar', 'ashar2']; if (st[3].indexOf('gl5x') >= 0) st[3] = ['arr']; });
-    return { LOC: LOC, R: R, steps: steps };
+    return { LOC: LOC, R: R, COL: COL, steps: steps };
   })();
   var runG = new THREE.Group(); scene.add(runG);
   var runSel = -1;
@@ -845,9 +850,10 @@ var CFG = {
     var maxT = 0, pts = 0;
     st[3].forEach(function (rk, j) {
       var p = RUN.R[rk]; if (!p) return;
-      ribbon3(p, 2.2, 0.5, mat(j ? 0x7b1fa2 : 0xe65100), runG);
+      var cc = RUN.COL[rk] || [j ? 0x7b1fa2 : 0xe65100, j ? '#7b1fa2' : '#e65100', ''];
+      ribbon3(p, 2.2, 0.5, mat(cc[0]), runG);
       for (var k = 1; k < p.length; k++) {                     // panah arah
-        var a = p[k - 1], b = p[k], mx = (a[0] + b[0]) / 2, mz = (a[1] + b[1]) / 2, cone = new THREE.Mesh(new THREE.ConeGeometry(1.4, 3.2, 10), mat(j ? 0x7b1fa2 : 0xe65100));
+        var a = p[k - 1], b = p[k], mx = (a[0] + b[0]) / 2, mz = (a[1] + b[1]) / 2, cone = new THREE.Mesh(new THREE.ConeGeometry(1.4, 3.2, 10), mat(cc[0]));
         cone.position.set(mx, hy(mx, mz) + 1.2, mz); cone.rotation.z = -Math.PI / 2; cone.rotation.y = -Math.atan2(b[1] - a[1], b[0] - a[0]); runG.add(cone);
       }
       turns(p).forEach(function (q) { pts++; var post = boxB(q[0] - 0.15, q[0] + 0.15, hy(q[0], q[1]), hy(q[0], q[1]) + 2.6, q[1] - 0.15, q[1] + 0.15, mat(0xf2a93b), runG);
@@ -855,7 +861,7 @@ var CFG = {
       var L = routeLen(p), pr = profileOf(p), gs = gradStats(pr, 20), n = st[3].length > 1 ? Math.ceil(N / st[3].length) : N;
       var head = L / 1.0, tail = n / (1.3 * 2.4), tot = head + tail; maxT = Math.max(maxT, tot);
       var rise = 0, fall = 0; for (var q2 = 1; q2 < pr.length; q2++) { var de = pr[q2].e - pr[q2 - 1].e; if (de > 0) rise += de; else fall -= de; }
-      html += '<b class="h" style="color:' + (j ? '#7b1fa2' : '#e65100') + '">Rute ' + (j + 1) + ' · ' + fmt(L, 0) + ' m · ±' + n + ' orang</b>' +
+      html += '<b class="h" style="color:' + cc[1] + '">' + (cc[2] ? cc[2] + '<br>' : 'Rute ' + (j + 1) + ' · ') + '' + '' + fmt(L, 0) + ' m · ±' + n + ' orang</b>' +
         'Naik ' + fmt(rise, 1) + ' m · turun ' + fmt(fall, 1) + ' m · gradien maks <span class="' + slopeCls(gs.max) + '">' + pct(gs.max) + '</span><br>' +
         'Kepala rombongan ±' + fmt(head / 60, 1) + ' mnt, ekor ±' + fmt(tot / 60, 1) + ' mnt (jalan 1 m/dtk, jalur efektif 2,4 m)';
     });
