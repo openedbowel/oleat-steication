@@ -4,6 +4,7 @@ Model 3D interaktif kampus ITB Ganesa untuk perencanaan layout acara dan alur mo
 
 - `index.html`: model kampus (gedung, jalan, elevasi, kemiringan, gerbang, fasilitas, himpunan, booth)
 - `labtek-v/index.html`: model Labtek V (tangga, arus peserta, titik kumpul)
+- `2d/index.html`: OLEAT 2D seluruh kampus untuk mobilisasi rundown Day 2 (alur, pointer, gradien, denah barisan Labtek V; bisa dicetak A3 / unduh SVG)
 
 Cukup dibuka di peramban; tidak perlu instalasi. Library 3D (three.js r128) dimuat dari cdnjs.
 
