@@ -75,17 +75,19 @@
         <button data-view="corr">Koridor</button>
       </div>
       <div class="grp">
-        <span class="sub">Lantai:</span>
-        <button data-floor="0" class="on">Semua</button>
-        <button data-floor="1">L1</button>
-        <button data-floor="2">L2</button>
-        <button data-floor="3">L3</button>
-        <button data-floor="4">L4</button>
+        <span class="sub">Tampilkan lantai:</span>
+        <button data-floor="0">Semua</button>
+        <button data-floor="1" class="on">L1</button>
+        <button data-floor="2" class="on">L2</button>
+        <button data-floor="3" class="on">L3</button>
+        <button data-floor="4" class="on">L4</button>
+        <button data-floor="solo" title="Klik lalu pilih satu lantai untuk ditampilkan sendirian">Satu saja</button>
       </div>
       <div class="grp">
         <button id="tWall">Dinding luar</button>
         <button id="tRoom" class="on">Sekat ruang</button>
         <button id="tLabel" class="on">Label</button>
+        <button id="tFade" class="on" title="Benda padat di dekat kamera memudar">Pudar dekat kamera</button>
         <button id="tSide">Panel</button>
       </div>
     </div>
@@ -220,22 +222,28 @@ var CFG = {
   core: { x0: 34.5, x1: 43.3, z0: 3.7, z1: 11.5, lift: [39.2, 42.8, 7.4, 10.0] },   // toilet + lift (denah)
   hydrant: { 2: [[6.7, 13.4], [36.9, 11.2], [95.6, 14.5]], 3: [[11.5, 13.6], [36.9, 11.6], [95.3, 13.6]], 4: [[12.6, 14.1], [35.1, 10.9], [96.6, 13.3]] },
   apar: { 2: [[23.7, 16.8], [76.9, 14.9]], 3: [[8.6, 13.2], [70.5, 13.5]] },
-  /* Ruang acara STEIcation Day 2 (dari panitia) — posisi per nomor ruang belum dipetakan kecuali Multimedia */
+  /* Ruang dari denah evakuasi beranotasi panitia (19 Nov 2026). rect = [x0, x1, z0, z1] m; n = peserta career path (asumsi 40/career path) */
   rooms: [
-    { f: 1, name: '7601 · career path', x: 60, z: 8, note: 'lantai 1 (posisi ruang di L1 belum ada denah)' },
-    { f: 3, name: 'Kelas 7602–7610 · career path', x: 24, z: 21, note: 'lantai 3, ruang kelas di sayap barat-tengah (nomor per ruang belum dipetakan)' },
-    { f: 3, name: 'Kelas L3 (sisi utara)', x: 26, z: 7, note: 'R. KELAS / R. KLS di sisi utara L3' },
-    { f: 4, name: 'R. Multimedia · career path', x: 46.9, z: 21.3, note: 'lantai 4 (dari denah)' }
+    { f: 2, name: 'R. Multimedia', rect: [91.5, 99.4, 2.6, 13.8], n: 40, cp: 1 },
+    { f: 3, name: '7602', rect: [23.5, 36.0, 2.6, 13.8], n: 40, cp: 1 },
+    { f: 3, name: '7606', rect: [13.9, 23.5, 16.6, 25.4], n: 40, cp: 1 },
+    { f: 3, name: '7607', rect: [82.8, 92.3, 2.6, 13.8], n: 20, cp: 1, pair: '7607 & 7608' },
+    { f: 3, name: '7608', rect: [42.3, 48.5, 2.6, 13.8], n: 20, cp: 1, pair: '7607 & 7608' },
+    { f: 3, name: '7609 & 7610', rect: [23.5, 36.0, 16.6, 25.4], n: 40, cp: 1 },
+    { f: 3, name: '7603', rect: [2.6, 5.4, 16.6, 25.4], n: 0 },
+    { f: 3, name: '7604', rect: [2.6, 5.4, 2.6, 13.8], n: 0 },
+    { f: 3, name: '7605', rect: [9.1, 13.9, 16.6, 25.4], n: 0 },
+    { f: 1, name: '7601 (posisi belum ada denah)', rect: [55, 63, 4, 12], n: 40, cp: 1, guess: 1 }
   ],
   zones: { 2: [2.6, 99.4], 3: [2.6, 46], 4: [43, 51] },   // sebaran asal/tujuan peserta per lantai
   emergency: [['Pusat Darurat ITB / K3L Ganesha (keamanan, ambulans, damkar)', '(022) 2500204'], ['Bumi Medika Ganesha', '(022) 2500082'], ['Keamanan, Kesehatan & Keselamatan ITB', '(022) 2510456'],
               ['RS Santo Borromeus', '(022) 2552000'], ['Ambulans RS Santo Borromeus', '(022) 2552080'], ['Emergency Call ITB', '0809 100 1920'], ['Layanan Darurat Nasional', '112']],
   presets: [
-    { id: 'cp1', label: '10.25–10.55 · Mobilisasi ke ruang career path 1 (naik)', dir: 'up', T: 30, n2: 0, n3: 160, n4: 40, n1: 40 },
-    { id: 'ish', label: '11.55 · Ishoma: keluar gedung (turun)', dir: 'down', T: 10, n2: 0, n3: 160, n4: 40, n1: 40 },
-    { id: 'cp2', label: '12.50–13.10 · Mobilisasi ke ruang career path 2 (naik)', dir: 'up', T: 20, n2: 0, n3: 160, n4: 40, n1: 40 },
-    { id: 'men', label: '14.10–14.25 · Mobilisasi ke mentoring Selasar VII/VIII (turun)', dir: 'down', T: 15, n2: 0, n3: 160, n4: 40, n1: 40 },
-    { id: 'evk', label: 'Evakuasi darurat saat career path (turun)', dir: 'down', T: 5, n2: 0, n3: 160, n4: 40, n1: 40 }
+    { id: 'cp1', label: '10.25–10.55 · Mobilisasi ke ruang career path 1 (naik)', dir: 'up', T: 30, n2: 40, n3: 160, n4: 0, n1: 40 },
+    { id: 'ish', label: '11.55 · Ishoma: keluar gedung (turun)', dir: 'down', T: 10, n2: 40, n3: 160, n4: 0, n1: 40 },
+    { id: 'cp2', label: '12.50–13.10 · Mobilisasi ke ruang career path 2 (naik)', dir: 'up', T: 20, n2: 40, n3: 160, n4: 0, n1: 40 },
+    { id: 'men', label: '14.10–14.25 · Mobilisasi ke mentoring Selasar VII/VIII (turun)', dir: 'down', T: 15, n2: 40, n3: 160, n4: 0, n1: 40 },
+    { id: 'evk', label: 'Evakuasi darurat saat career path (turun)', dir: 'down', T: 5, n2: 40, n3: 160, n4: 0, n1: 40 }
   ],
   defExits: [
     { name: 'Lobi utara', x: 34, z: 0, on: 1 },
@@ -243,7 +251,7 @@ var CFG = {
     { name: 'Ujung barat', x: 0, z: 14, on: 1 },
     { name: 'Ujung timur', x: 102, z: 14, on: 1 }
   ],
-  defFlow: { dir: 'up', T: 30, n2: 0, n3: 160, n4: 40, split: 'near', Fs: 1.0, Vs: 0.5, Vw: 1.2, Bl: 0.15 },   // asumsi 240 peserta, 40 per career path
+  defFlow: { dir: 'up', T: 30, n2: 40, n3: 160, n4: 0, split: 'near', Fs: 1.0, Vs: 0.5, Vw: 1.2, Bl: 0.15 },   // asumsi 240 peserta, 40 per career path
   floorCol: [0x2e8b57, 0x2e8b57, 0x3b6fd6, 0x9b4dca, 0xd6336c],
   /* Tingkat pelayanan tangga (Fruin), orang/menit per meter lebar */
   /* Dari "Peta Simbol" & "Peta HMPS" Capanlap ITB Day AMI 2026, diselaraskan ke koordinat lokal (±10 m) */
@@ -304,7 +312,7 @@ var CFG = {
   function mmss(sec) { sec = Math.max(0, Math.round(sec)); return Math.floor(sec / 60) + ':' + ('0' + sec % 60).slice(-2); }
 
   /* ---------- state (tersimpan) ---------- */
-  var LS_KEY = 'labtek5-oleat-v2';
+  var LS_KEY = 'labtek5-oleat-v3';
   var S = { stairs: JSON.parse(JSON.stringify(C.defStairs)), exits: JSON.parse(JSON.stringify(C.defExits)), flow: JSON.parse(JSON.stringify(C.defFlow)) };
   try { var sv = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); if (sv && sv.stairs) S = sv; } catch (e) {}
   function save() { try { localStorage.setItem(LS_KEY, JSON.stringify(S)); } catch (e) {} }
@@ -398,7 +406,13 @@ var CFG = {
       if (f2 === 1) label('Lift (dari denah)', (K.lift[0] + K.lift[1]) / 2, FH * C.levels + 0.8, (K.lift[2] + K.lift[3]) / 2, 0.6, gf2, 'rgba(225,235,250,0.96)');
       (C.hydrant[f2] || []).forEach(function (h) { var m = boxB(h[0] - 0.35, h[0] + 0.35, y, y + 1.2, h[1] - 0.15, h[1] + 0.15, mat(0xd32f2f), gf2); m.userData.floor = f2; });
       (C.apar[f2] || []).forEach(function (h) { var m = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.6, 10), mat(0xd32f2f)); m.position.set(h[0], y + 0.3, h[1]); gf2.add(m); });
-      C.rooms.forEach(function (r) { if (r.f !== f2) return; label(r.name, r.x, y + 1.6, r.z, 0.62, gf2, 'rgba(255,244,214,0.97)', 90); });
+      C.rooms.forEach(function (r) {
+        if (r.f !== f2) return; var q = r.rect, col = r.cp ? (r.guess ? 0xf2c14e : 0xe65100) : 0x8a9399;
+        var pl = new THREE.Mesh(new THREE.PlaneGeometry(q[1] - q[0] - 0.3, q[3] - q[2] - 0.3), new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: r.cp ? 0.38 : 0.22, depthWrite: false }));
+        pl.rotation.x = -Math.PI / 2; pl.position.set((q[0] + q[1]) / 2, y + 0.07, (q[2] + q[3]) / 2); pl.renderOrder = 6; pl.userData.fade = 'slab'; pl.userData.fy = y; gf2.add(pl);
+        if (r.cp) { var eg = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(q[1] - q[0] - 0.3, 2.2, q[3] - q[2] - 0.3)), new THREE.LineBasicMaterial({ color: col })); eg.position.set(pl.position.x, y + 1.1, pl.position.z); gf2.add(eg); }
+        label((r.cp ? '★ ' : '') + (r.pair ? r.pair + ' (' + r.name + ')' : r.name) + (r.cp && r.n ? ' · ' + r.n + ' org' : ''), pl.position.x, y + 2.6, pl.position.z, r.cp ? 0.78 : 0.55, gf2, r.cp ? 'rgba(255,226,196,0.97)' : 'rgba(235,238,240,0.95)', r.cp ? 1e9 : 70);
+      });
       label('L' + f2 + (f2 === 1 ? ' · ±' + fmt(C.elev.mean, 1) + ' m dpl' : ' · +' + fmt((f2 - 1) * FH, 1) + ' m'), -2.5, y + 1.2, C.W / 2, 0.9, gf2, 'rgba(255,240,220,0.95)');
     }
     // atap tipis sebagai penutup (selalu disembunyikan saat lihat dalam)
@@ -470,7 +484,7 @@ var CFG = {
     tex.center.set(0.5, 0.5); tex.rotation = -o.rot * Math.PI / 2;
     var m = new THREE.Mesh(new THREE.PlaneGeometry(C.L * o.sx, C.W * o.sz), new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity: o.op, depthWrite: false }));
     m.rotation.x = -Math.PI / 2; m.position.set(C.L / 2 + o.ox, (f - 1) * FH + 0.04, C.W / 2 + o.oz); m.renderOrder = 5; m.userData.floor = f;
-    G.plans.add(m); planMesh[f] = m; applyFloor();
+    G.plans.add(m); planMesh[f] = m; applyFloor(); collectFade();
   }
 
   /* ===================== PERHITUNGAN ARUS ===================== */
@@ -480,22 +494,33 @@ var CFG = {
     S.stairs.forEach(function (s, i) { if (!+s.on || s.top < f) return; var p = stairPathDown(s, 2, 1)[0]; var d = Math.abs(p[0] - x) + Math.abs(p[2] - z); if (d < bd) { bd = d; best = i; } });
     return best;
   }
-  function assign() {                                       // jumlah peserta per tangga per lantai
-    var F = S.flow, A = S.stairs.map(function () { return [0, 0, 0, 0, 0]; });
+  function roomPlan() {                                     // peserta per ruang -> tangga, per lantai
+    var F = S.flow, plan = [];
     [2, 3, 4].forEach(function (f) {
       var N = +F['n' + f] || 0; if (!N) return;
       var act = S.stairs.map(function (s, i) { return (+s.on && s.top >= f) ? i : -1; }).filter(function (i) { return i >= 0; });
       if (!act.length) return;
-      if (F.split === 'near') {                              // tiap modul ruang ke tangga terdekat
-        var zn = C.zones[f] || [0.3, C.L - 0.3], share = {};
-        for (var x = zn[0] + 0.5; x < zn[1]; x += 1) { var ns = nearestStair(x, (C.corridor.z0 + C.corridor.z1) / 2, f); if (ns >= 0) share[ns] = (share[ns] || 0) + 1; }
-        var tot = 0; for (var kk in share) tot += share[kk];
-        var left = N; Object.keys(share).forEach(function (kk, j, arr) { var v = j === arr.length - 1 ? left : Math.round(N * share[kk] / tot); A[kk][f] += v; left -= v; });
-      } else {
-        var we = act.map(function (i) { return Math.max(0.05, S.stairs[i].w - 2 * F.Bl); }), sw = we.reduce(function (a, b) { return a + b; }, 0), left2 = N;
-        act.forEach(function (i, j) { var v = j === act.length - 1 ? left2 : Math.round(N * we[j] / sw); A[i][f] += v; left2 -= v; });
+      var rooms = C.rooms.filter(function (r) { return r.f === f && r.cp && r.n > 0; });
+      if (!rooms.length) {                                     // tanpa ruang acara: sebar sepanjang koridor
+        var zn = C.zones[f] || [2.6, C.L - 2.6], seg = (zn[1] - zn[0]) / 6;
+        rooms = [0, 1, 2, 3, 4, 5].map(function (k) { return { rect: [zn[0] + k * seg, zn[0] + (k + 1) * seg, 16.6, 25.4], n: 1, name: 'lantai ' + f }; });
       }
+      var wsum = rooms.reduce(function (t, r) { return t + r.n; }, 0), left = N;
+      rooms.forEach(function (r, j) {
+        var n = j === rooms.length - 1 ? left : Math.round(N * r.n / wsum); left -= n; if (n <= 0) return;
+        var cx = (r.rect[0] + r.rect[1]) / 2, cz = (r.rect[2] + r.rect[3]) / 2;
+        if (F.split === 'near') { var ns = nearestStair(cx, cz, f); if (ns >= 0) plan.push({ f: f, room: r, st: ns, n: n }); }
+        else {
+          var we = act.map(function (i) { return Math.max(0.05, S.stairs[i].w - 2 * F.Bl); }), sw = we.reduce(function (a, b) { return a + b; }, 0), l2 = n;
+          act.forEach(function (i, k) { var v = k === act.length - 1 ? l2 : Math.round(n * we[k] / sw); l2 -= v; if (v > 0) plan.push({ f: f, room: r, st: i, n: v }); });
+        }
+      });
     });
+    return plan;
+  }
+  function assign() {                                       // jumlah peserta per tangga per lantai
+    var A = S.stairs.map(function () { return [0, 0, 0, 0, 0]; });
+    roomPlan().forEach(function (p) { A[p.st][p.f] += p.n; });
     return A;
   }
   function flowCalc() {
@@ -539,6 +564,10 @@ var CFG = {
       if (r.los[1] >= 'D') warn.push(r.s.name + ': LOS ' + r.los[1] + ' (' + fmt(r.q, 0) + ' org/mnt/m) — antrean di mulut tangga hampir pasti.');
     });
     html += warn.length ? '<div class="warnbox">' + warn.map(function (w) { return '• ' + w; }).join('<br>') + '</div>' : '<div class="note ok">Tidak ada peringatan untuk skenario ini.</div>';
+    var RP = roomPlan();
+    if (RP.length) html += '<table class="res" style="margin-top:8px"><tr><th>Ruang</th><th>Lantai</th><th>Orang</th><th>Tangga</th></tr>' +
+      RP.map(function (p) { return '<tr><td>' + (p.room.pair ? p.room.pair + ' (' + p.room.name + ')' : p.room.name) + '</td><td>L' + p.f + '</td><td>' + p.n + '</td><td>' + S.stairs[p.st].name + '</td></tr>'; }).join('') +
+      '<tr><td>7601</td><td>L1</td><td>' + (C.rooms.filter(function (r) { return r.f === 1 && r.cp; }).reduce(function (t, r) { return t + r.n; }, 0)) + '</td><td>tanpa tangga</td></tr></table>';
     html += '<details style="margin-top:6px"><summary class="note" style="display:inline;cursor:pointer">Rincian per tangga</summary><table class="res">' +
       '<tr><th>Tangga</th><th>L2/L3/L4</th><th>Lebar ef.</th><th>Aliran</th><th>Padat</th></tr>' +
       R.rows.filter(function (r) { return !r.off; }).map(function (r) { return '<tr><td>' + r.s.name + '</td><td>' + r.byF[2] + '/' + r.byF[3] + '/' + r.byF[4] + '</td><td>' + fmt(r.We, 2) + ' m</td><td>' + fmt(r.Fc, 2) + ' org/dtk</td><td>' + fmt(r.dens, 1) + '/m²</td></tr>'; }).join('') +
@@ -565,23 +594,18 @@ var CFG = {
     agents = []; simT = 0; done = 0; simOn = false; document.getElementById('bSim').textContent = '▶ Mulai';
     var F = S.flow, A = assign(), up = F.dir === 'up';
     buckets = S.stairs.map(function (s) { return { rate: Math.max(0, s.w - 2 * F.Bl) * F.Fs, tok: 1, q: {} }; });
-    S.stairs.forEach(function (s, i) {
-      [2, 3, 4].forEach(function (f) {
-        for (var n = 0; n < A[i][f] && agents.length < MAXA; n++) {
-          var zn = C.zones[f] || [1, C.L - 1], side = f === 4 ? 1 : (Math.random() < 0.5 ? 0 : 1), rx = zn[0] + Math.random() * (zn[1] - zn[0]);
-          var rz = side ? C.corridor.z1 + 1.2 + Math.random() * 7 : C.corridor.z0 - 1.2 - Math.random() * 9;
-          var sp = stairPathDown(s, f, 1), top = sp[0], bot = sp[sp.length - 1];
-          var ex = exitNear(bot[0], bot[2]) || { x: bot[0], z: bot[2] };
-          var pre = flatRoute([rx, rz], [top[0], top[2]], (f - 1) * FH), post = flatRoute([bot[0], bot[2]], [ex.x, ex.z], 0);
-          var path, gate;
-          if (!up) { path = pre.concat(sp, post); gate = pre.length; }
-          else {                                                // naik: dari pintu masuk -> tangga -> ruang
-            var spr = sp.slice().reverse(), postR = post.slice().reverse(), preR = pre.slice().reverse();
-            path = postR.concat(spr, preR); gate = postR.length;
-          }
-          agents.push({ p: path, i: 0, t: 0, gate: gate, st: i, f: f, wait: false, out: false, delay: Math.random() * 20, x: path[0][0], y: path[0][1], z: path[0][2] });
-        }
-      });
+    roomPlan().forEach(function (pl) {
+      var s = S.stairs[pl.st], f = pl.f, q = pl.room.rect, i = pl.st;
+      for (var n = 0; n < pl.n && agents.length < MAXA; n++) {
+        var rx = q[0] + 0.8 + Math.random() * Math.max(0.2, q[1] - q[0] - 1.6), rz = q[2] + 0.8 + Math.random() * Math.max(0.2, q[3] - q[2] - 1.6);
+        var sp = stairPathDown(s, f, 1), top = sp[0], bot = sp[sp.length - 1];
+        var ex = exitNear(bot[0], bot[2]) || { x: bot[0], z: bot[2] };
+        var pre = flatRoute([rx, rz], [top[0], top[2]], (f - 1) * FH), post = flatRoute([bot[0], bot[2]], [ex.x, ex.z], 0);
+        var path, gate;
+        if (!up) { path = pre.concat(sp, post); gate = pre.length; }
+        else { var spr = sp.slice().reverse(), postR = post.slice().reverse(), preR = pre.slice().reverse(); path = postR.concat(spr, preR); gate = postR.length; }
+        agents.push({ p: path, i: 0, t: 0, gate: gate, st: i, f: f, wait: false, out: false, delay: Math.random() * 20, x: path[0][0], y: path[0][1], z: path[0][2] });
+      }
     });
     aMesh.count = agents.length; updateAgents(0); updateSimBar();
   }
@@ -619,7 +643,7 @@ var CFG = {
       }
     });
     agents.forEach(function (a, idx) {
-      if (a.out || (curFloor && a.y > (curFloor - 1) * FH + 1)) M4.makeScale(0.0001, 0.0001, 0.0001); else M4.makeTranslation(a.x, a.y, a.z);
+      if (a.out || !visF[Math.min(C.levels, Math.max(1, Math.floor((a.y + 0.6) / FH) + 1))]) M4.makeScale(0.0001, 0.0001, 0.0001); else M4.makeTranslation(a.x, a.y, a.z);
       aMesh.setMatrixAt(idx, M4);
       aMesh.setColorAt(idx, cTmp.set(a.wait ? 0xf2a93b : C.floorCol[a.f]));
     });
@@ -686,7 +710,7 @@ var CFG = {
   document.getElementById('bDelStair').onclick = function () { if (selStair < 0) return; S.stairs.splice(selStair, 1); selStair = -1; save(); rebuildAll(); selectStair(-1); };
   var moveMode = false;
   document.getElementById('bMoveStair').onclick = function () { moveMode = !moveMode; this.classList.toggle('on', moveMode); hint.textContent = moveMode ? 'Klik posisi baru di lantai (titik = sudut awal lajur naik).' : baseHint; };
-  function rebuildAll() { buildStructure(); buildStairs(); buildExits(); applyFloor(); renderStairs(); renderFlow(); resetSim(); pruneLabels(); }
+  function rebuildAll() { buildStructure(); buildStairs(); buildExits(); applyFloor(); renderStairs(); renderFlow(); resetSim(); pruneLabels(); if (typeof collectFade === 'function') collectFade(); }
   function pruneLabels() { labels = labels.filter(function (s) { var p = s; while (p.parent) p = p.parent; return p === scene; }); }
 
   /* ===================== UI: arus ===================== */
@@ -698,7 +722,7 @@ var CFG = {
   document.getElementById('bSim').onclick = function () {
     if (!agents.length || done === agents.length) resetSim();
     simOn = !simOn; this.textContent = simOn ? '❚❚ Jeda' : '▶ Lanjut';
-    if (simOn && curFloor !== 0) setFloor(0);
+    if (simOn && !visF.slice(1).every(Boolean)) setFloor(0);
   };
   document.getElementById('bSimReset').onclick = function () { resetSim(); };
 
@@ -736,34 +760,92 @@ var CFG = {
     ps.onchange = function () {
       var p = C.presets.filter(function (q) { return q.id === ps.value; })[0]; if (!p) { document.getElementById('presetNote').textContent = ''; return; }
       S.flow.dir = p.dir; S.flow.T = p.T; S.flow.n2 = p.n2; S.flow.n3 = p.n3; S.flow.n4 = p.n4; S.flow.split = 'near'; save(); syncFlowInputs(); renderFlow(); resetSim();
-      document.getElementById('presetNote').innerHTML = 'Asumsi 240 peserta (40 per career path): ' + p.n1 + ' orang di 7601 (lantai 1, tanpa tangga), ' + p.n3 + ' di kelas L3 (7602, 7606, 7607–7608, 7609–7610), ' + p.n4 + ' di R. Multimedia L4. Target waktu = durasi slot di rundown. Ubah angka di bawah bila jumlah peserta berbeda.';
+      document.getElementById('presetNote').innerHTML = 'Asumsi 240 peserta (40 per career path): ' + p.n1 + ' di 7601 (L1, tanpa tangga), ' + p.n2 + ' di R. Multimedia (L2), ' + p.n3 + ' di L3 (7602, 7606, 7607 &amp; 7608, 7609 &amp; 7610). Peserta tiap lantai dibagi ke ruangnya, lalu ke tangga terdekat dari ruang itu. Target waktu = durasi slot rundown.';
     };
     document.getElementById('emgTable').innerHTML = C.emergency.map(function (e) { return '<tr><td>' + e[0] + '</td><td><b>' + e[1] + '</b></td></tr>'; }).join('');
   })();
   function syncFlowInputs() { Object.keys(fMap).forEach(function (id) { document.getElementById(id).value = S.flow[fMap[id]]; }); }
 
   /* ===================== tampilan lantai ===================== */
-  var curFloor = 0, wallsOn = false, roomsOn = true;
-  function vis(obj) {                                       // 0 = semua; n = tampilkan s.d. lantai n, lantai di atasnya disembunyikan
-    var f = obj.userData.floor; if (!f || curFloor === 0) return true; return f <= curFloor;
-  }
+  var curFloor = 0, wallsOn = false, roomsOn = true, visF = [true, true, true, true, true], soloArm = false;
+  function floorOn(f) { return !f || visF[f]; }
+  function vis(obj) { return floorOn(obj.userData.floor); }
   function applyFloor() {
-    for (var f = 1; f <= C.levels; f++) floors[f].visible = curFloor === 0 || f <= curFloor;
+    for (var f = 1; f <= C.levels; f++) floors[f].visible = visF[f];
     G.walls.children.forEach(function (m) { m.visible = wallsOn && vis(m); });
     G.rooms.children.forEach(function (m) { m.visible = roomsOn && vis(m); });
     G.plans.children.forEach(function (m) { m.visible = vis(m); });
     stairMeshes.forEach(function (m) { m.visible = vis(m); });
-    G.stairs.children.forEach(function (grp) { grp.children.forEach(function (c) { if (c.isSprite) c.visible = curFloor === 0; }); });
-    document.querySelectorAll('[data-floor]').forEach(function (b) { b.classList.toggle('on', +b.getAttribute('data-floor') === curFloor); });
+    var all = visF.slice(1).every(Boolean);
+    G.stairs.children.forEach(function (grp) { grp.children.forEach(function (c) { if (c.isSprite) c.visible = all; }); });
+    G.marks.children.forEach(function (m) { if (m.userData.floor) m.visible = floorOn(m.userData.floor); });
+    document.querySelectorAll('[data-floor]').forEach(function (b) {
+      var k = b.getAttribute('data-floor');
+      b.classList.toggle('on', k === 'solo' ? soloArm : k === '0' ? all : visF[+k]);
+    });
     if (agents.length) updateAgents(0);
   }
-  function setFloor(f) { curFloor = f; applyFloor(); if (f) { target.set(C.L / 2, (f - 1) * FH, C.W / 2); setCam(); } }
-  document.querySelectorAll('[data-floor]').forEach(function (b) { b.onclick = function () { setFloor(+b.getAttribute('data-floor')); }; });
+  function setFloor(f) {                                   // tampilkan L1..f (dipakai tampilan koridor & denah)
+    for (var k = 1; k <= C.levels; k++) visF[k] = !f || k <= f; curFloor = f; applyFloor();
+    if (f) { target.set(C.L / 2, (f - 1) * FH, C.W / 2); setCam(); }
+  }
+  document.querySelectorAll('[data-floor]').forEach(function (b) {
+    b.onclick = function () {
+      var k = b.getAttribute('data-floor');
+      if (k === 'solo') { soloArm = !soloArm; applyFloor(); hint.textContent = soloArm ? 'Pilih lantai yang ingin ditampilkan sendirian.' : baseHint; return; }
+      if (k === '0') { for (var j = 1; j <= C.levels; j++) visF[j] = true; soloArm = false; applyFloor(); return; }
+      var f = +k;
+      if (soloArm) { for (var j2 = 1; j2 <= C.levels; j2++) visF[j2] = j2 === f; soloArm = false; hint.textContent = baseHint; target.set(target.x, (f - 1) * FH, target.z); setCam(); }
+      else visF[f] = !visF[f];
+      applyFloor();
+    };
+  });
   function tog(id, fn, init) { var b = document.getElementById(id), on = init; b.classList.toggle('on', on); b.onclick = function () { on = !on; b.classList.toggle('on', on); fn(on); }; }
   tog('tWall', function (v) { wallsOn = v; applyFloor(); }, false);
   tog('tRoom', function (v) { roomsOn = v; applyFloor(); }, true);
   tog('tLabel', function (v) { labelsOn = v; }, true);
   tog('tSide', function (v) { document.getElementById('side').classList.toggle('hide', !v); }, true);
+  var fadeOn = true, fadeList = [];
+  tog('tFade', function (v) { fadeOn = v; if (!v) fadeList.forEach(function (it) { setOp(it, 1); }); }, true);
+  function collectFade() {                                   // benda padat yang boleh memudar saat kamera mendekat
+    fadeList = [];
+    function add(m, type, fy) {
+      if (!m.material || Array.isArray(m.material) || m.isSprite) return;
+      if (!m.userData.fadeMat) { m.material = m.material.clone(); m.userData.fadeMat = true; m.userData.baseOp = m.material.opacity; m.userData.baseDW = m.material.depthWrite; }
+      m.updateMatrixWorld(true);
+      fadeList.push({ m: m, type: type, fy: fy, box: new THREE.Box3().setFromObject(m) });
+    }
+    for (var f = 1; f <= C.levels; f++) floors[f].traverse(function (o) {
+      if (!(o.isMesh || o.isLineSegments)) return;
+      var b = new THREE.Box3().setFromObject(o), flat = (b.max.y - b.min.y) < 0.5 && (b.max.x - b.min.x) > 6;
+      add(o, flat ? 'slab' : 'obj', b.max.y);
+    });
+    G.walls.children.forEach(function (o) { add(o, 'obj'); });
+    G.rooms.children.forEach(function (o) { add(o, 'obj'); });
+    G.plans.children.forEach(function (o) { add(o, 'slab', o.position.y); });
+  }
+  function setOp(it, k) {
+    var m = it.m, base = m.userData.baseOp == null ? 1 : m.userData.baseOp, op = base * k;
+    if (Math.abs(m.material.opacity - op) < 0.01) return;
+    m.material.opacity = op; m.material.transparent = op < 0.999 || base < 1; m.material.depthWrite = k > 0.97 ? m.userData.baseDW : false; m.material.needsUpdate = true;
+  }
+  var camP = new THREE.Vector3();
+  function updateFade() {
+    if (!fadeOn) return;
+    camP.copy(camera.position);
+    var dt = camP.distanceTo(target), near = Math.min(1, Math.max(0, (48 - dt) / 22));
+    fadeList.forEach(function (it) {
+      if (!it.m.visible && !it.m.parent.visible) return;
+      var k = 1;
+      if (it.type === 'slab') {
+        if (near > 0 && it.fy > target.y + 0.4 && camP.y > it.fy - 0.3) k = 1 - near * 0.9;    // pelat di atas titik fokus menutupi pandangan
+      } else {
+        var d = it.box.distanceToPoint(camP);
+        if (d < 12 && d < dt * 0.9) k = 0.08 + 0.92 * Math.min(1, Math.max(0, (d - 1) / 11));
+      }
+      setOp(it, k);
+    });
+  }
   document.querySelectorAll('[data-tab]').forEach(function (b) {
     b.onclick = function () {
       document.querySelectorAll('[data-tab]').forEach(function (x) { x.classList.toggle('on', x === b); });
@@ -863,7 +945,13 @@ var CFG = {
       if (done === agents.length) { simOn = false; document.getElementById('bSim').textContent = '▶ Mulai lagi'; }
       updateSimBar();
     }
-    for (var j = 0; j < labels.length; j++) { var s = labels[j]; s.getWorldPosition(tmp); if (!s.parent || !s.parent.visible) continue; s.material.opacity = labelsOn ? 1 : 0; }
+    for (var j = 0; j < labels.length; j++) {
+      var s = labels[j]; if (!s.parent || !s.parent.visible) continue; s.getWorldPosition(tmp);
+      var d = tmp.distanceTo(camera.position), f = Math.min(1.6, Math.max(0.28, d / 45));   // ukuran label mengikuti jarak
+      s.material.opacity = (labelsOn && d < (s.userData.maxD || 1e9)) ? 1 : 0;
+      if (!s.userData.s0) s.userData.s0 = s.scale.clone(); s.scale.set(s.userData.s0.x * f, s.userData.s0.y * f, 1);
+    }
+    updateFade();
     renderer.render(scene, camera);
   })();
   window.__dbg = { S: S, flowCalc: flowCalc, resetSim: resetSim, go: go, setFloor: setFloor, agents: function () { return agents; }, step: function (t) { for (var i = 0; i < t * 10; i++) { simT += 0.1; updateAgents(0.1); } updateSimBar(); } };

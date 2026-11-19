@@ -100,6 +100,7 @@
         <button id="tLabel" class="on">Label</button>
         <button id="tTree" class="on">Pohon</button>
         <button id="tRoof" class="on">Atap Labtek</button>
+        <button id="tFadeC" class="on" title="Gedung di dekat kamera memudar">Pudar dekat kamera</button>
       </div>
       <div class="grp">
         <input id="search" type="text" list="searchList" placeholder="Cari gedung / nomor…" style="width:190px"><datalist id="searchList"></datalist>
@@ -146,7 +147,7 @@
       </div>
       <ul id="runList" style="margin:8px 0 0;padding:0;list-style:none;font-size:12px"></ul>
       <div id="runOut"></div>
-      <p class="note">Sumber: Teknis Lapangan &amp; Rundown STEIcation Day 2. Disesuaikan: games di parkiran Labtek V, pengumuman Best Mentee, Forum &amp; kepulangan di Plaza Widya Nusantara (Lapangan CC Timur tidak dipakai). Asumsi: kedatangan lewat Gerbang Utama, Ishoma ke Masjid Salman, Ashar ke musholla terdekat. Jumlah peserta asumsi 240 bila belum diisi.</p>
+      <p class="note">Sumber: Teknis Lapangan &amp; Rundown STEIcation Day 2. Revisi rundown: games, pengumuman Best Mentee, Forum &amp; kepulangan di Plaza Widya Nusantara (Lapangan CC Timur tidak dipakai). Ruang career path: R. Multimedia (L2), 7601 (L1), 7602, 7606, 7607 &amp; 7608, 7609 &amp; 7610 (L3). Asumsi: kedatangan lewat Gerbang Utama, Ishoma ke Masjid Salman, Ashar ke musholla terdekat. Jumlah peserta asumsi 240 bila belum diisi.</p>
     </div>
     <div class="panel" id="facPanel">
       <h2>Fasilitas (peta panitia lapangan AMI 2026)</h2>
@@ -773,9 +774,9 @@ var CFG = {
   /* ===================== RUNDOWN STEICATION DAY 2 ===================== */
   var RUN = (function () {
     var LOC = {
-      gerbang: [-8, 296, 'Gerbang Utama'], gkub: [-185, -13, 'GKU Barat · R. 9125 & 9126'], l5: [-79, 10, 'Labtek V (7601 L1, 7602–7610 L3, Multimedia L4)'],
+      gerbang: [-8, 296, 'Gerbang Utama'], gkub: [-185, -13, 'GKU Barat · R. 9125 & 9126'], l5: [-79, 10, 'Labtek V (7601 L1 · Multimedia L2 · 7602, 7606, 7607 & 7608, 7609 & 7610 L3)'],
       selVII: [3, -41, 'Selasar Labtek VII Barat'], selVIII: [100, 10, 'Selasar Labtek VIII Timur'], selVI: [-86, -38, 'Selasar Labtek VI · TIDAK DIPAKAI'],
-      park: [-80, 39, 'Parkiran Labtek V · games'], plaza: [-16, -50, 'Plaza Widya Nusantara'], salman: [70, 348, 'Masjid Salman']
+      plaza: [-16, -50, 'Plaza Widya Nusantara'], salman: [70, 348, 'Masjid Salman']
     };
     var R = {
       arr: [[-8, 296], [-8, 238], [-8, 163], [-10, 94], [-13, 59], [-113, 62], [-199, 65], [-197, 27], [-190, 5]],
@@ -783,9 +784,8 @@ var CFG = {
       ishOut: [[-96, 24], [-96, 42], [-87, 61], [-13, 59], [-10, 94], [-8, 163], [-8, 238], [-8, 296], [40, 306], [70, 322], [70, 345]],
       menVII: [[-28, 10], [-11, 10], [-11, -20], [-8, -41], [3, -41]],
       menVIII: [[-28, 10], [-11, 15], [1, 15], [100, 15], [100, 10]],
-      gamVII: [[3, -41], [-8, -41], [-11, -20], [-11, 15], [-27, 30], [-60, 39]],
-      gamVIII: [[100, 10], [100, 15], [1, 15], [-11, 15], [-27, 30], [-60, 39]],
-      plaza: [[-60, 39], [-27, 30], [-11, 15], [-11, -20], [-16, -50]],
+      plzVII: [[3, -41], [-8, -45], [-16, -50]],
+      plzVIII: [[100, 10], [100, 15], [1, 15], [-11, 15], [-11, -20], [-16, -50]],
       pulang: [[-16, -50], [-11, -20], [-11, 15], [-13, 59], [-10, 94], [-8, 163], [-8, 238], [-8, 296]]
     };
     function rev(a) { return a.slice().reverse(); }
@@ -794,7 +794,7 @@ var CFG = {
       ['08.30–08.40', 'Kedatangan & pengondisian', 'gkub', [], 10, 'MC, Lapangan', 'Peserta duduk berkelompok sesuai career path; Lapangan cek kehadiran.', 'Menjaga pintu ruangan', 'Mengarahkan ke kelompok career path', 'Berjaga', 'Acara di dalam ruangan', 'Peserta yang basah didata Medik', 0],
       ['08.40–08.55', 'Pretest', 'gkub', [], 15, 'Acara', 'Pretest di layar.', 'Menjaga ruangan kondusif', 'Membantu peserta membuka pretest', 'Berjaga', 'Di dalam ruangan', 'Di dalam ruangan', 0],
       ['08.55–10.25', 'Materi Git', 'gkub', [], 90, 'Acara', 'Dasar-dasar Git dengan hands on.', 'Menjaga & mencegah gangguan', 'Membantu peserta yang tertinggal', 'Berjaga', 'Di dalam ruangan', 'Di dalam ruangan', 0],
-      ['10.25–10.55', 'Mobilisasi ke ruang career path 1', 'l5', ['gl5'], 30, 'Lapangan', 'GKU Barat → Labtek V: Multimedia (L4), 7601 (L1), 7602, 7606, 7607–7608, 7609–7610 (L3). Arus naik tangga dihitung di model Labtek V.', 'Menjaga jalur mobilisasi', 'Berjaga di depan tiap ruangan', 'Berjalan di belakang rombongan', 'Mobilisasi tetap berjalan', 'Lewat koridor dan jalur teduh', 1],
+      ['10.25–10.55', 'Mobilisasi ke ruang career path 1', 'l5', ['gl5'], 30, 'Lapangan', 'GKU Barat → Labtek V: 7601 (L1), R. Multimedia (L2), 7602, 7606, 7607 & 7608, 7609 & 7610 (L3). Arus naik tangga per ruang dihitung di model Labtek V.', 'Menjaga jalur mobilisasi', 'Berjaga di depan tiap ruangan', 'Berjalan di belakang rombongan', 'Mobilisasi tetap berjalan', 'Lewat koridor dan jalur teduh', 1],
       ['10.55–11.55', 'Career path 1 + QnA', 'l5', [], 60, 'Acara', '6 career path: software engineer, data science, project manager, cyber security, UI/UX designer, game developer.', 'Menjaga & mencegah gangguan', 'Membantu peserta yang salah masuk ruangan', 'Berjaga', 'Di dalam ruangan', 'Di dalam ruangan', 0],
       ['11.55–12.50', 'Ishoma (sporadis)', 'salman', ['ishOut'], 55, 'Acara, Lapangan', 'Istirahat, makan, ibadah. Asumsi: sholat di Masjid Salman (bisa juga musholla terdekat).', 'Berkeliling memantau area sporadis', 'Mengarahkan ke tempat makan & masjid/musholla', 'Standby di pos medik', 'Makan di area beratap', 'Peserta tetap di dalam gedung, pengondisian bisa mundur', 1],
       ['12.50–13.10', 'Mobilisasi ke career path 2', 'l5', ['ishBack'], 20, 'Lapangan', 'Kembali ke Labtek V, pindah ke ruang career path berikutnya (arus dua arah di koridor & tangga).', 'Menjaga jalur mobilisasi', 'Berjaga di depan tiap ruangan', 'Berjalan di belakang rombongan', 'Mobilisasi tetap berjalan', 'Lewat koridor dan jalur teduh', 1],
@@ -802,11 +802,11 @@ var CFG = {
       ['14.10–14.25', 'Mobilisasi mentoring', 'selVII', ['menVII', 'menVIII'], 15, 'Mentor, Lapangan', 'Ke Selasar Labtek VII Barat & Labtek VIII Timur. Selasar Labtek VI TIDAK dipakai. Arus turun tangga dihitung di model Labtek V.', 'Menjaga Selasar Labtek VI tidak dipakai', 'Mengarahkan kelompok ke titik mentoring', 'Berjalan di belakang rombongan', 'Tetap berjalan dengan payung/ponco', 'Kelompok ke bagian selasar paling terlindung', 1],
       ['14.25–15.25', 'Mentoring + post-test', 'selVII', [], 60, 'Mentor', 'Mentoring prospek & pandangan karier, lalu post-test.', 'Menjaga & mencegah gangguan', 'Membantu peserta yang terpisah', 'Berkeliling ke titik mentoring', 'Bergeser ke bagian selasar beratap', 'Pindah ke ruangan/selasar beratap yang dikonfirmasi Operasional', 0],
       ['15.25–15.55', 'Sholat Ashar', 'selVII', ['ashar'], 30, 'Mentor, Lapangan', 'Ke musholla terdekat; peserta yang tidak sholat tetap bersama kelompok.', 'Menjaga area kelompok yang tidak sholat', 'Mengarahkan ke masjid/musholla terdekat', 'Berjaga', 'Memakai payung/ponco', 'Lewat jalur teduh, waktu menyesuaikan', 1],
-      ['15.55–16.25', 'Mobilisasi ke parkiran Labtek V', 'park', ['gamVII', 'gamVIII'], 30, 'Lapangan', 'Disesuaikan: games di parkiran Labtek V (bukan Lapangan CC Timur).', 'Menjaga jalur menuju parkiran Labtek V', 'Menata posisi per kelompok', 'Berjalan di belakang rombongan', 'Tetap berjalan dengan payung/ponco', 'Mobilisasi ditahan, peserta menunggu di selasar', 1],
-      ['16.25–16.40', 'Games', 'park', [], 15, 'Acara', 'Ice breaking & games; hadiah snack renceng & Chocolatos.', 'Menjaga & mencegah gangguan', 'Mengatur posisi peserta saat games', 'Berjaga', 'Durasi dipersingkat', 'Pindah ke selasar beratap terdekat atau diganti ice breaking singkat', 0],
-      ['16.40–16.50', 'Pengumuman Best Mentee', 'plaza', ['plaza'], 10, 'Acara, MC', 'Disesuaikan: di Plaza Widya Nusantara.', 'Menjaga & mencegah gangguan', '–', 'Berjaga', 'Tetap berjalan', 'Di selasar beratap terdekat', 1],
+      ['15.55–16.25', 'Mobilisasi ke Plaza Widya Nusantara', 'plaza', ['plzVII', 'plzVIII'], 30, 'Lapangan', 'Revisi rundown: games di Plaza Widya Nusantara (kolom keterangan rundown masih menulis Lapangan CC Timur; yang dipakai lokasi di kolom Tempat).', 'Menjaga jalur menuju Plaza Widya Nusantara', 'Menata posisi per kelompok', 'Berjalan di belakang rombongan', 'Tetap berjalan dengan payung/ponco', 'Mobilisasi ditahan, peserta menunggu di selasar', 1],
+      ['16.25–16.40', 'Games', 'plaza', [], 15, 'Acara', 'Ice breaking & games; hadiah snack renceng & Chocolatos.', 'Menjaga & mencegah gangguan', 'Mengatur posisi peserta saat games', 'Berjaga', 'Durasi dipersingkat', 'Pindah ke selasar beratap terdekat atau diganti ice breaking singkat', 0],
+      ['16.40–16.50', 'Pengumuman Best Mentee', 'plaza', [], 10, 'Acara, MC', 'Di Plaza Widya Nusantara (lanjut dari games).', 'Menjaga & mencegah gangguan', '–', 'Berjaga', 'Tetap berjalan', 'Di selasar beratap terdekat', 0],
       ['16.50–17.30', 'Forum', 'plaza', [], 40, 'Acara', 'Disesuaikan: di Plaza Widya Nusantara. Evaluasi Day 2 panitia ↔ peserta.', 'Menjaga & mencegah gangguan', '–', 'Berjaga', 'Peserta memakai payung/jas hujan', 'Pindah ke selasar/ruangan beratap terdekat', 0],
-      ['17.30–18.00', 'Kepulangan & clear area', 'gerbang', ['pulang'], 30, 'Operasional, Lapangan', 'Disesuaikan: Labtek V, parkiran Labtek V & Plaza Widya Nusantara harus steril.', 'Menyisir Labtek V, parkiran & Plaza Widya', 'Mengarahkan peserta ke jalur keluar', 'Memastikan peserta yang ditangani medik ada pendamping', 'Tetap berjalan', 'Menunggu di selasar sampai hujan reda, barang diamankan dulu', 1],
+      ['17.30–18.00', 'Kepulangan & clear area', 'gerbang', ['pulang'], 30, 'Operasional, Lapangan', 'Disesuaikan: Labtek V & Plaza Widya Nusantara harus steril (rundown masih menulis Lapangan CC Timur).', 'Menyisir Labtek V & Plaza Widya', 'Mengarahkan peserta ke jalur keluar', 'Memastikan peserta yang ditangani medik ada pendamping', 'Tetap berjalan', 'Menunggu di selasar sampai hujan reda, barang diamankan dulu', 1],
       ['18.00–18.30', 'Evaluasi panitia', 'plaza', [], 30, 'Seluruh panitia', 'Evaluasi antarpanitia.', '–', '–', '–', 'Berlanjut', 'Di selasar beratap terdekat', 0]
     ];
     // musholla terdekat dari titik mentoring (untuk Ashar)
@@ -1225,7 +1225,9 @@ var CFG = {
   tog('tSteps', function (v) { G.steps.visible = v; }, true);
   tog('tSlope', function (v) { slopeOn = v; refreshGround(); }, false);
   tog('tContour', function (v) { contourOn = v; refreshGround(); }, true);
+  tog('tFadeC', function (v) { fadeOn = v; if (!v) fadeItems.forEach(function (it) { fadeMat(it.m, 1); }); }, true);
   tog('tFocus', function (v) {
+    focusOn = v; fadeItems.forEach(function (it) { fadeMat(it.m, 1); });
     buildings.forEach(function (m) { if (m.userData.base) m.material = v ? [ghostRoof, ghostWall] : m.userData.base; m.children.forEach(function (c) { c.visible = !v; }); });
     if (v) go('labtek5');
   }, false);
@@ -1289,6 +1291,37 @@ var CFG = {
 
   try { var saved = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); if (saved) load(saved); else renderList(); } catch (e) { renderList(); }
 
+  /* ---------- benda padat memudar saat kamera mendekat ---------- */
+  var fadeOn = true, fadeItems = [], camQ = new THREE.Vector3(), focusOn = false;
+  function collectFade() {
+    fadeItems = [];
+    buildings.forEach(function (m) { m.updateMatrixWorld(true); fadeItems.push({ m: m, box: new THREE.Box3().setFromObject(m) }); });
+    G.roofs.children.forEach(function (m) { m.updateMatrixWorld(true); fadeItems.push({ m: m, box: new THREE.Box3().setFromObject(m) }); });
+    G.l5.children.forEach(function (m) { if (m.isMesh && buildings.indexOf(m) < 0) { m.updateMatrixWorld(true); fadeItems.push({ m: m, box: new THREE.Box3().setFromObject(m) }); } });
+  }
+  collectFade();
+  function fadeMat(m, k) {
+    if (k > 0.97) {
+      if (m.userData.faded) { m.material = m.userData.orig; m.userData.faded = false; m.children.forEach(function (c) { c.visible = true; }); }
+      return;
+    }
+    if (!m.userData.faded) {
+      m.userData.orig = m.material;
+      m.userData.fmat = Array.isArray(m.material) ? m.material.map(function (q) { return q.clone(); }) : m.material.clone();
+      m.material = m.userData.fmat; m.userData.faded = true;
+    }
+    (Array.isArray(m.material) ? m.material : [m.material]).forEach(function (q) { q.transparent = true; q.opacity = k; q.depthWrite = false; });
+    m.children.forEach(function (c) { c.visible = k > 0.4; });
+  }
+  function updateFade() {
+    if (!fadeOn || focusOn) return;
+    camQ.copy(camera.position); var dt = camQ.distanceTo(target);
+    fadeItems.forEach(function (it) {
+      var d = it.box.distanceToPoint(camQ), k = 1;
+      if (d < 45 && d < dt * 0.85) k = 0.1 + 0.9 * Math.min(1, Math.max(0, (d - 3) / 42));
+      fadeMat(it.m, k);
+    });
+  }
   /* ---------- loop ---------- */
   var tmp = new THREE.Vector3();
   (function loop() {
@@ -1301,6 +1334,7 @@ var CFG = {
       s.scale.set(s.userData.s0.x * f, s.userData.s0.y * f, 1);
     }
     G.steps.children.forEach(function (c) { if (c.userData.lookCam) { c.rotation.set(Math.PI / 2, 0, 0); c.lookAt(camera.position.x, c.position.y, camera.position.z); c.rotateX(Math.PI / 2); } });
+    updateFade();
     renderer.render(scene, camera);
   })();
   window.__scene = scene; window.__dbg = { elevAbs: elevAbs, H0: H0, slopeAt: slopeAt, roadByName: roadByName, profileOf: profileOf, gradStats: gradStats, L5: L5fb, go: go };
