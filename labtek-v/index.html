@@ -63,7 +63,7 @@
   <header>
     <div class="row">
       <h1>46 · Labtek V – Benny Subianto I · tangga &amp; arus peserta</h1>
-      <span class="tag">TAKSIRAN · posisi tangga &amp; ruang belum dari denah</span>
+      <span class="tag" style="color:#1f5f8b;background:#e3eef7;border-color:#b5cfe3">L2–L4 dari denah evakuasi · L1 masih taksiran · lebar tangga perlu diukur</span>
       <span class="sub" id="elevSub"></span>
       <a class="sub" href="../">← Model kampus Ganesa</a>
     </div>
@@ -113,7 +113,7 @@
       </div>
 
       <div class="pane on" id="tStair">
-        <div class="redbox">Posisi, lebar, dan jumlah tangga di bawah ini <b>taksiran</b>. Ukur di lokasi (lebar bersih antar-dinding/pegangan, tinggi &amp; dalam anak tangga, ukuran bordes) lalu masukkan angkanya di sini.</div>
+        <div class="redbox">Jumlah &amp; posisi tangga mengikuti <b>denah evakuasi L2–L4</b> (±1 m). <b>Lebar, tinggi &amp; dalam anak tangga, dan bordes masih dibaca dari gambar</b>: ukur di lokasi lalu masukkan angkanya di sini. Lantai 1 belum ada denahnya.</div>
         <ul class="lst" id="stairList"></ul>
         <div class="btns"><button id="bAddStair">+ Tambah tangga</button></div>
         <div id="stairEdit" style="display:none">
@@ -140,7 +140,10 @@
       </div>
 
       <div class="pane" id="tFlow">
-        <h2>Skenario mobilisasi</h2>
+        <h2>Skenario dari rundown Day 2 (Minggu, 22 Nov 2026)</h2>
+        <select id="fPreset" style="width:100%"></select>
+        <p class="note" id="presetNote" style="margin-top:4px"></p>
+        <h2 style="margin-top:10px">Skenario mobilisasi</h2>
         <div class="grid2">
           <div><label>Arah</label><select id="fDir"><option value="down">Turun (keluar gedung)</option><option value="up">Naik (masuk ke lantai acara)</option></select></div>
           <div><label>Target waktu (menit)</label><input type="number" id="fT" min="1" step="1"></div>
@@ -169,6 +172,9 @@
       </div>
 
       <div class="pane" id="tPlan">
+        <h2>Nomor darurat</h2>
+        <table class="res" id="emgTable"></table>
+        <p class="note">Dari denah evakuasi Labtek V dan Teknis Lapangan STEIcation Day 2. Tempat berkumpul menurut denah: <b>Taman</b> di sisi Labtek V.</p>
         <h2>Tempel denah sebagai alas</h2>
         <p class="note" style="margin-top:0">Unggah foto/scan denah tiap lantai, misalnya <b>denah evakuasi</b> yang biasanya terpasang di dinding tiap lantai. Gambar direntangkan ke tapak gedung 102 × 28 m (utara di atas), lalu tangga bisa digeser agar pas dengan denah.</p>
         <label>Lantai</label>
@@ -201,13 +207,35 @@
    Sumbu lokal: x = barat -> timur (0 = ujung barat), z = utara -> selatan (0 = sisi utara), y = tinggi dari lantai dasar. */
 var CFG = {
   L: 102, W: 28, arcade: 2.6, levels: 4, floorH: 3.8, slab: 0.22,
-  corridor: { z0: 12.5, z1: 15.5 },                 // koridor tengah memanjang (taksiran)
+  corridor: { z0: 13.8, z1: 16.6 },                 // koridor internal (dari denah evakuasi L2–L4)
   module: 8.5,                                       // jarak sekat ruang (taksiran)
   elev: { mean: 775.2, min: 774.9, max: 776.8 },    // m dpl dari DEM, rata-rata/min/maks di bawah tapak
+  /* Tangga dari denah evakuasi L2–L4 (posisi ±1 m). Lebar per lajur 1,8 m dibaca dari gambar — WAJIB diukur ulang di lokasi. */
   defStairs: [
-    { name: 'T1 barat', x: 6,  z: 8.6, w: 1.5, rot: 0, r: 17.3, t: 28, top: 4, on: 1 },
-    { name: 'T2 tengah', x: 42, z: 8.6, w: 1.5, rot: 0, r: 17.3, t: 28, top: 4, on: 1 },
-    { name: 'T3 timur', x: 90, z: 8.6, w: 1.5, rot: 0, r: 17.3, t: 28, top: 4, on: 1 }
+    { name: 'T1 barat', x: 8.6,  z: 16.6, w: 1.8, rot: 1, r: 17.3, t: 28, top: 4, on: 1 },
+    { name: 'T2 tengah (hall)', x: 40.4, z: 16.6, w: 1.8, rot: 1, r: 17.3, t: 28, top: 4, on: 1 },
+    { name: 'T3 timur', x: 97.6, z: 16.6, w: 1.8, rot: 1, r: 17.3, t: 28, top: 4, on: 1 }
+  ],
+  denah: { 2: 'denah/L2.jpg', 3: 'denah/L3.jpg', 4: 'denah/L4.jpg' },
+  core: { x0: 34.5, x1: 43.3, z0: 3.7, z1: 11.5, lift: [39.2, 42.8, 7.4, 10.0] },   // toilet + lift (denah)
+  hydrant: { 2: [[6.7, 13.4], [36.9, 11.2], [95.6, 14.5]], 3: [[11.5, 13.6], [36.9, 11.6], [95.3, 13.6]], 4: [[12.6, 14.1], [35.1, 10.9], [96.6, 13.3]] },
+  apar: { 2: [[23.7, 16.8], [76.9, 14.9]], 3: [[8.6, 13.2], [70.5, 13.5]] },
+  /* Ruang acara STEIcation Day 2 (dari panitia) — posisi per nomor ruang belum dipetakan kecuali Multimedia */
+  rooms: [
+    { f: 1, name: '7601 · career path', x: 60, z: 8, note: 'lantai 1 (posisi ruang di L1 belum ada denah)' },
+    { f: 3, name: 'Kelas 7602–7610 · career path', x: 24, z: 21, note: 'lantai 3, ruang kelas di sayap barat-tengah (nomor per ruang belum dipetakan)' },
+    { f: 3, name: 'Kelas L3 (sisi utara)', x: 26, z: 7, note: 'R. KELAS / R. KLS di sisi utara L3' },
+    { f: 4, name: 'R. Multimedia · career path', x: 46.9, z: 21.3, note: 'lantai 4 (dari denah)' }
+  ],
+  zones: { 2: [2.6, 99.4], 3: [2.6, 46], 4: [43, 51] },   // sebaran asal/tujuan peserta per lantai
+  emergency: [['Pusat Darurat ITB / K3L Ganesha (keamanan, ambulans, damkar)', '(022) 2500204'], ['Bumi Medika Ganesha', '(022) 2500082'], ['Keamanan, Kesehatan & Keselamatan ITB', '(022) 2510456'],
+              ['RS Santo Borromeus', '(022) 2552000'], ['Ambulans RS Santo Borromeus', '(022) 2552080'], ['Emergency Call ITB', '0809 100 1920'], ['Layanan Darurat Nasional', '112']],
+  presets: [
+    { id: 'cp1', label: '10.25–10.55 · Mobilisasi ke ruang career path 1 (naik)', dir: 'up', T: 30, n2: 0, n3: 160, n4: 40, n1: 40 },
+    { id: 'ish', label: '11.55 · Ishoma: keluar gedung (turun)', dir: 'down', T: 10, n2: 0, n3: 160, n4: 40, n1: 40 },
+    { id: 'cp2', label: '12.50–13.10 · Mobilisasi ke ruang career path 2 (naik)', dir: 'up', T: 20, n2: 0, n3: 160, n4: 40, n1: 40 },
+    { id: 'men', label: '14.10–14.25 · Mobilisasi ke mentoring Selasar VII/VIII (turun)', dir: 'down', T: 15, n2: 0, n3: 160, n4: 40, n1: 40 },
+    { id: 'evk', label: 'Evakuasi darurat saat career path (turun)', dir: 'down', T: 5, n2: 0, n3: 160, n4: 40, n1: 40 }
   ],
   defExits: [
     { name: 'Lobi utara', x: 34, z: 0, on: 1 },
@@ -215,7 +243,7 @@ var CFG = {
     { name: 'Ujung barat', x: 0, z: 14, on: 1 },
     { name: 'Ujung timur', x: 102, z: 14, on: 1 }
   ],
-  defFlow: { dir: 'down', T: 10, n2: 120, n3: 120, n4: 120, split: 'width', Fs: 1.0, Vs: 0.5, Vw: 1.2, Bl: 0.15 },
+  defFlow: { dir: 'up', T: 30, n2: 0, n3: 160, n4: 40, split: 'near', Fs: 1.0, Vs: 0.5, Vw: 1.2, Bl: 0.15 },   // asumsi 240 peserta, 40 per career path
   floorCol: [0x2e8b57, 0x2e8b57, 0x3b6fd6, 0x9b4dca, 0xd6336c],
   /* Tingkat pelayanan tangga (Fruin), orang/menit per meter lebar */
   /* Dari "Peta Simbol" & "Peta HMPS" Capanlap ITB Day AMI 2026, diselaraskan ke koordinat lokal (±10 m) */
@@ -276,7 +304,7 @@ var CFG = {
   function mmss(sec) { sec = Math.max(0, Math.round(sec)); return Math.floor(sec / 60) + ':' + ('0' + sec % 60).slice(-2); }
 
   /* ---------- state (tersimpan) ---------- */
-  var LS_KEY = 'labtek5-oleat-v1';
+  var LS_KEY = 'labtek5-oleat-v2';
   var S = { stairs: JSON.parse(JSON.stringify(C.defStairs)), exits: JSON.parse(JSON.stringify(C.defExits)), flow: JSON.parse(JSON.stringify(C.defFlow)) };
   try { var sv = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); if (sv && sv.stairs) S = sv; } catch (e) {}
   function save() { try { localStorage.setItem(LS_KEY, JSON.stringify(S)); } catch (e) {} }
@@ -347,7 +375,7 @@ var CFG = {
         var m = boxB(q[0], q[1], y, y + FH - C.slab, q[2], q[3], wm, G.walls); m.userData.floor = f2;
       });
       // sekat ruang (taksiran): modul tiap 8,5 m di kedua sisi koridor, pintu 1 m ke koridor
-      var rz = [[f2 === 1 ? a : 0.3, C.corridor.z0], [C.corridor.z1, f2 === 1 ? C.W - a : C.W - 0.3]];
+      var rz = f2 === 1 ? [[a, C.corridor.z0], [C.corridor.z1, C.W - a]] : [];   // L2–L4: ruang dibaca dari denah (alas gambar)
       var rx0 = f2 === 1 ? a : 0.3, rx1 = f2 === 1 ? C.L - a : C.L - 0.3, pm = mat(0xe9e4da, { transparent: true, opacity: 0.3, depthWrite: false });
       rz.forEach(function (zz) {
         for (var xs = rx0 + C.module; xs < rx1 - 1; xs += C.module) {
@@ -362,10 +390,19 @@ var CFG = {
           if (segB > segA) { var m4 = boxB(segA, segB, y, y + FH - C.slab, zc - 0.06, zc + 0.06, pm, G.rooms); m4.userData.floor = f2; }
         }
       });
+      var K = C.core;
+      if (f2 > 1) {
+        boxB(K.x0, K.x1, y, y + 0.9, K.z0, K.z0 + 0.12, mat(0xb9b2a4), gf2); boxB(K.x0, K.x1, y, y + 0.9, K.z1 - 0.12, K.z1, mat(0xb9b2a4), gf2);
+      }
+      var lf = boxB(K.lift[0], K.lift[1], y, y + FH - C.slab, K.lift[2], K.lift[3], mat(0x4a6fa5, { transparent: true, opacity: 0.55 }), gf2);
+      if (f2 === 1) label('Lift (dari denah)', (K.lift[0] + K.lift[1]) / 2, FH * C.levels + 0.8, (K.lift[2] + K.lift[3]) / 2, 0.6, gf2, 'rgba(225,235,250,0.96)');
+      (C.hydrant[f2] || []).forEach(function (h) { var m = boxB(h[0] - 0.35, h[0] + 0.35, y, y + 1.2, h[1] - 0.15, h[1] + 0.15, mat(0xd32f2f), gf2); m.userData.floor = f2; });
+      (C.apar[f2] || []).forEach(function (h) { var m = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.6, 10), mat(0xd32f2f)); m.position.set(h[0], y + 0.3, h[1]); gf2.add(m); });
+      C.rooms.forEach(function (r) { if (r.f !== f2) return; label(r.name, r.x, y + 1.6, r.z, 0.62, gf2, 'rgba(255,244,214,0.97)', 90); });
       label('L' + f2 + (f2 === 1 ? ' · ±' + fmt(C.elev.mean, 1) + ' m dpl' : ' · +' + fmt((f2 - 1) * FH, 1) + ' m'), -2.5, y + 1.2, C.W / 2, 0.9, gf2, 'rgba(255,240,220,0.95)');
     }
     // atap tipis sebagai penutup (selalu disembunyikan saat lihat dalam)
-    label('Lobi tengah (taksiran)', 34, 1.8, C.W / 2, 0.6, floors[1], null, 60);
+    label('Hall tengah (sesuai denah L2–L4)', 33.5, 1.8, C.W / 2, 0.6, floors[1], null, 60);
   }
 
   /* ---------- tangga ---------- */
@@ -419,6 +456,13 @@ var CFG = {
 
   /* ---------- denah overlay ---------- */
   var planImg = [null, null, null, null, null], planMesh = [null, null, null, null, null];
+  setTimeout(function () {
+    Object.keys(C.denah).forEach(function (k) {
+      var f = +k, img = new Image();
+      img.onload = function () { if (!planImg[f]) { planImg[f] = { img: img, opts: { rot: 0, op: 0.92, sx: 1, sz: 1, ox: 0, oz: 0 }, def: true }; buildPlan(f); } };
+      img.src = C.denah[k];
+    });
+  }, 0);
   function buildPlan(f) {
     if (planMesh[f]) { G.plans.remove(planMesh[f]); planMesh[f] = null; }
     var im = planImg[f]; if (!im) return;
@@ -443,8 +487,8 @@ var CFG = {
       var act = S.stairs.map(function (s, i) { return (+s.on && s.top >= f) ? i : -1; }).filter(function (i) { return i >= 0; });
       if (!act.length) return;
       if (F.split === 'near') {                              // tiap modul ruang ke tangga terdekat
-        var mods = Math.floor((C.L - 0.6) / C.module), share = {};
-        for (var mI = 0; mI < mods; mI++) { var x = 0.3 + (mI + 0.5) * C.module, ns = nearestStair(x, (C.corridor.z0 + C.corridor.z1) / 2, f); if (ns >= 0) share[ns] = (share[ns] || 0) + 1; }
+        var zn = C.zones[f] || [0.3, C.L - 0.3], share = {};
+        for (var x = zn[0] + 0.5; x < zn[1]; x += 1) { var ns = nearestStair(x, (C.corridor.z0 + C.corridor.z1) / 2, f); if (ns >= 0) share[ns] = (share[ns] || 0) + 1; }
         var tot = 0; for (var kk in share) tot += share[kk];
         var left = N; Object.keys(share).forEach(function (kk, j, arr) { var v = j === arr.length - 1 ? left : Math.round(N * share[kk] / tot); A[kk][f] += v; left -= v; });
       } else {
@@ -468,7 +512,7 @@ var CFG = {
       var dens = Fc > 0 ? Math.min(N / Tsec, Fc) / (F.Vs * We) : 0;                        // org/m² di lajur tangga
       var needW = N / (F.Fs * Math.max(1, Tsec - travel)) + 2 * F.Bl;
       var los = losOf(qDemand), cap = Fc * 60;
-      worst = Math.max(worst, tTot);
+      if (N) worst = Math.max(worst, tTot);
       rows.push({ s: s, N: N, byF: A[i], We: We, Fc: Fc, cap: cap, tTot: tTot, travel: travel, q: qDemand, los: los, dens: dens, needW: needW, g: g, ok: tTot <= Tsec });
     });
     return { rows: rows, worst: worst, totalN: totalN };
@@ -479,7 +523,7 @@ var CFG = {
     html += '<table class="res"><tr><th>Tangga</th><th>Orang</th><th>Kap./mnt</th><th>Waktu</th><th>LOS</th></tr>';
     R.rows.forEach(function (r) {
       if (r.off) { html += '<tr><td>' + r.s.name + '</td><td colspan="4" style="color:#7d8488">ditutup</td></tr>'; return; }
-      html += '<tr><td>' + r.s.name + '</td><td>' + r.N + '</td><td>' + fmt(r.cap, 0) + '</td><td class="' + (r.ok ? 'ok' : 'bad') + '">' + mmss(r.tTot) + '</td><td><span class="los" style="background:' + r.los[2] + '">' + r.los[1] + '</span></td></tr>';
+      html += '<tr><td>' + r.s.name + '</td><td>' + r.N + '</td><td>' + fmt(r.cap, 0) + '</td><td class="' + (r.ok ? 'ok' : 'bad') + '">' + (r.N ? mmss(r.tTot) : '–') + '</td><td><span class="los" style="background:' + r.los[2] + '">' + r.los[1] + '</span></td></tr>';
     });
     html += '</table><p class="note" style="margin-top:6px"><b>Total ' + R.totalN + ' peserta</b> · ' + verdict + '</p>';
     var warn = [];
@@ -524,7 +568,8 @@ var CFG = {
     S.stairs.forEach(function (s, i) {
       [2, 3, 4].forEach(function (f) {
         for (var n = 0; n < A[i][f] && agents.length < MAXA; n++) {
-          var side = Math.random() < 0.5 ? 0 : 1, rx = 1 + Math.random() * (C.L - 2), rz = side ? C.corridor.z1 + 1 + Math.random() * 9 : C.corridor.z0 - 1 - Math.random() * 9;
+          var zn = C.zones[f] || [1, C.L - 1], side = f === 4 ? 1 : (Math.random() < 0.5 ? 0 : 1), rx = zn[0] + Math.random() * (zn[1] - zn[0]);
+          var rz = side ? C.corridor.z1 + 1.2 + Math.random() * 7 : C.corridor.z0 - 1.2 - Math.random() * 9;
           var sp = stairPathDown(s, f, 1), top = sp[0], bot = sp[sp.length - 1];
           var ex = exitNear(bot[0], bot[2]) || { x: bot[0], z: bot[2] };
           var pre = flatRoute([rx, rz], [top[0], top[2]], (f - 1) * FH), post = flatRoute([bot[0], bot[2]], [ex.x, ex.z], 0);
@@ -685,6 +730,16 @@ var CFG = {
     S = { stairs: JSON.parse(JSON.stringify(C.defStairs)), exits: JSON.parse(JSON.stringify(C.defExits)), flow: JSON.parse(JSON.stringify(C.defFlow)) };
     save(); syncFlowInputs(); selStair = -1; rebuildAll(); selectStair(-1); b.textContent = 'Kembalikan bawaan';
   };
+  (function () {
+    var ps = document.getElementById('fPreset'), o0 = document.createElement('option'); o0.value = ''; o0.textContent = '— atur manual —'; ps.appendChild(o0);
+    C.presets.forEach(function (p) { var o = document.createElement('option'); o.value = p.id; o.textContent = p.label; ps.appendChild(o); });
+    ps.onchange = function () {
+      var p = C.presets.filter(function (q) { return q.id === ps.value; })[0]; if (!p) { document.getElementById('presetNote').textContent = ''; return; }
+      S.flow.dir = p.dir; S.flow.T = p.T; S.flow.n2 = p.n2; S.flow.n3 = p.n3; S.flow.n4 = p.n4; S.flow.split = 'near'; save(); syncFlowInputs(); renderFlow(); resetSim();
+      document.getElementById('presetNote').innerHTML = 'Asumsi 240 peserta (40 per career path): ' + p.n1 + ' orang di 7601 (lantai 1, tanpa tangga), ' + p.n3 + ' di kelas L3 (7602, 7606, 7607–7608, 7609–7610), ' + p.n4 + ' di R. Multimedia L4. Target waktu = durasi slot di rundown. Ubah angka di bawah bila jumlah peserta berbeda.';
+    };
+    document.getElementById('emgTable').innerHTML = C.emergency.map(function (e) { return '<tr><td>' + e[0] + '</td><td><b>' + e[1] + '</b></td></tr>'; }).join('');
+  })();
   function syncFlowInputs() { Object.keys(fMap).forEach(function (id) { document.getElementById(id).value = S.flow[fMap[id]]; }); }
 
   /* ===================== tampilan lantai ===================== */
@@ -797,6 +852,7 @@ var CFG = {
 
   /* ---------- mulai ---------- */
   resize(); rebuildAll(); go('overview');
+  document.getElementById('fPreset').value = 'cp1'; document.getElementById('fPreset').onchange();
   var tmp = new THREE.Vector3(), lastT = performance.now();
   (function loop() {
     requestAnimationFrame(loop);
