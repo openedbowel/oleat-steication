@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Layout 3D Kampus ITB Ganesa</title>
+<style>
+  :root{--ink:#1b2226;--muted:#5b666c;--bg:#e9eced;--panel:#ffffff;--line:#d3d9dc;--accent:#1f5f8b}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;font:14px system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg)}
+  #app{position:fixed;inset:0;display:flex;flex-direction:column}
+  header{background:var(--panel);border-bottom:1px solid var(--line);padding:8px 12px;display:flex;flex-direction:column;gap:6px}
+  .row{display:flex;gap:6px;align-items:center;overflow-x:auto;scrollbar-width:none}
+  .row::-webkit-scrollbar{display:none}
+  h1{font-size:15px;margin:0;font-weight:650;white-space:nowrap}
+  .sub{color:var(--muted);font-size:12px;white-space:nowrap}
+  .grp{display:flex;gap:4px;padding-right:8px;margin-right:2px;border-right:1px solid var(--line);align-items:center}
+  .grp:last-child{border-right:0}
+  button,select,input[type=text],input[type=number]{font:inherit;font-size:13px;padding:6px 10px;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--ink);white-space:nowrap}
+  button{cursor:pointer}
+  button:hover{border-color:var(--accent)}
+  button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  button.warn{color:#a3281c}
+  .legend{display:flex;gap:12px;font-size:12px;color:var(--muted);white-space:nowrap}
+  .sw{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px;border:1px solid rgba(0,0,0,.15)}
+  #stage{position:relative;flex:1;min-height:0;touch-action:none;overflow:hidden}
+  #stage canvas{display:block;width:100%;height:100%}
+  #hint{position:absolute;left:10px;bottom:10px;font-size:12px;color:var(--muted);background:rgba(255,255,255,.92);padding:6px 9px;border-radius:7px;max-width:calc(100% - 20px)}
+  #info{position:absolute;left:10px;top:10px;font-size:13px;line-height:1.45;background:rgba(255,255,255,.96);padding:8px 10px;border-radius:8px;border:1px solid var(--line);display:none;max-width:300px}
+  #err{position:absolute;inset:0;display:none;align-items:center;justify-content:center;text-align:center;padding:24px;background:var(--bg)}
+  .panel{position:absolute;top:10px;right:10px;width:300px;max-width:calc(100% - 20px);max-height:calc(100% - 20px);overflow:auto;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px;display:none;box-shadow:0 6px 24px rgba(0,0,0,.12)}
+  .panel h2{font-size:13px;margin:2px 0 8px}
+  .panel label{display:block;font-size:12px;color:var(--muted);margin:8px 0 3px}
+  .panel select,.panel input[type=text]{width:100%}
+  .panel .btns{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+  .panel .note{font-size:12px;color:var(--muted);line-height:1.45;margin:8px 0 0}
+  .panel textarea{width:100%;height:90px;font:12px ui-monospace,monospace;border:1px solid var(--line);border-radius:7px;padding:6px;margin-top:6px}
+  #list{margin:8px 0 0;padding:0;list-style:none;font-size:12px;max-height:180px;overflow:auto;border-top:1px solid var(--line)}
+  #list li{padding:5px 2px;border-bottom:1px solid #eef1f2;display:flex;gap:6px;align-items:center;cursor:pointer}
+  #list li.sel{background:#eaf2f8}
+  #list li i{width:10px;height:10px;border-radius:2px;flex:none}
+  #list li span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #list li em{color:var(--muted);font-style:normal}
+  #stats{font-size:12px;color:var(--muted);margin-top:6px}
+  table.kv{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+  table.kv td{padding:3px 2px;border-bottom:1px solid #eef1f2}
+  table.kv td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+  .bad{color:#b3261e;font-weight:600}.mid{color:#a86200;font-weight:600}.ok{color:#2e7d32;font-weight:600}
+  #gateList li{padding:6px 2px;border-bottom:1px solid #eef1f2}
+  #gateList li b{font-size:12.5px}
+  #gateList li .meta{color:var(--muted);margin-top:2px}
+  #gateList li button{font-size:12px;padding:3px 7px;margin:4px 4px 0 0}
+  .panel label.facRow{margin:0;color:var(--ink)}
+  .facRow{display:flex !important;align-items:center;gap:7px;font-size:12.5px;padding:4px 0;border-bottom:1px solid #eef1f2}
+  .facRow i{width:20px;height:20px;border-radius:5px;color:#fff;font-style:normal;font-weight:700;font-size:10px;display:flex;align-items:center;justify-content:center;flex:none}
+  .facRow span{flex:1}.facRow em{color:var(--muted);font-style:normal}
+  #prof svg{width:100%;height:auto;display:block;margin-top:8px;background:#fafbfb;border:1px solid #eef1f2;border-radius:6px}
+  .warnbox{font-size:12px;line-height:1.45;background:#fff6e5;border:1px solid #f0d49a;border-radius:7px;padding:7px 8px;margin-top:8px;color:#6b4a00}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="row">
+      <h1>Layout 3D Kampus ITB Ganesa</h1>
+      <span class="sub">Nama gedung, jalan, gerbang &amp; fasilitas: peta Capantour &amp; Capanlap ITB Day AMI 2026 · foto udara: peta ITB Kampus Ganesha (FITB, 2016) · bentuk gedung: OSM · elevasi: DEM ±30 m</span>
+      <a class="sub" href="labtek-v/">Model dalam Labtek V (tangga &amp; arus) →</a>
+    </div>
+    <div class="row">
+      <div class="grp">
+        <button data-view="overview" class="on">Perspektif</button>
+        <button data-view="top">Tampak atas</button>
+        <button data-view="labtek5">Labtek V</button>
+        <button data-view="gerbang">Gerbang Ganesha</button>
+        <button data-view="boulevard">Boulevard</button>
+        <button data-view="jalan2">Jalan II</button>
+      </div>
+      <div class="grp">
+        <button id="tPhoto" class="on">Foto udara</button>
+        <button id="tSlope">Peta kemiringan</button>
+        <button id="tContour" class="on">Kontur 1 m</button>
+        <button id="tSteps" class="on">Tangga luar</button>
+        <button id="bProf">Profil jalan</button>
+      </div>
+      <div class="grp">
+        <button id="bFac">Fasilitas</button>
+        <button id="bGate">Gerbang</button>
+        <button id="tHm">Himpunan</button>
+      </div>
+      <div class="grp">
+        <button id="tFocus">Fokus Labtek V</button>
+        <button id="tMain" class="on">Sorot jalan utama</button>
+        <button id="tLabel" class="on">Label</button>
+        <button id="tTree" class="on">Pohon</button>
+        <button id="tRoof" class="on">Atap Labtek</button>
+      </div>
+      <div class="grp">
+        <input id="search" type="text" list="searchList" placeholder="Cari gedung / nomor…" style="width:190px"><datalist id="searchList"></datalist>
+        <button id="bBooth">Atur booth</button>
+        <button id="bMeasure">Ukur jarak &amp; gradien</button>
+      </div>
+    </div>
+    <div class="row legend" id="legMap">
+      <span><i class="sw" style="background:#e07b39"></i>Labtek V</span>
+      <span><i class="sw" style="background:#d9dcd6"></i>Gedung lain</span>
+      <span><i class="sw" style="background:#f2c14e"></i>Jalan utama</span>
+      <span><i class="sw" style="background:#5d6469"></i>Jalan kampus</span>
+      <span><i class="sw" style="background:#c9b99a"></i>Pedestrian &amp; koridor</span>
+      <span><i class="sw" style="background:#d62f2f"></i>Tangga luar (OSM)</span>
+      <span><i class="sw" style="background:#9cc27e"></i>Taman / lapangan</span>
+    </div>
+    <div class="row legend" id="legSlope" style="display:none">
+      <span>Kemiringan tanah:</span>
+      <span><i class="sw" style="background:#3f9b4b"></i>&lt; 5% datar</span>
+      <span><i class="sw" style="background:#c7d84a"></i>5–8,3% landai</span>
+      <span><i class="sw" style="background:#f2a93b"></i>8,3–12% (batas ramp 1:12)</span>
+      <span><i class="sw" style="background:#e0552d"></i>12–20% curam</span>
+      <span><i class="sw" style="background:#9c1f2e"></i>&gt; 20% sangat curam</span>
+    </div>
+  </header>
+  <div id="stage">
+    <div id="hint">Seret: putar · Gulir / cubit: zoom · Shift+seret atau klik kanan: geser · Klik tanah/gedung untuk elevasi &amp; info</div>
+    <div id="info"></div>
+    <div id="err"><div>Model 3D tidak bisa dimuat: library 3D dari internet diblokir atau peramban tidak mendukung WebGL.</div></div>
+
+    <div class="panel" id="prof">
+      <h2>Profil elevasi jalan</h2>
+      <label>Ruas jalan</label>
+      <select id="selRoad"></select>
+      <div id="profOut"></div>
+      <div class="warnbox">Elevasi dari model elevasi digital (DEM) resolusi ±30 m yang sudah dihaluskan. Ketelitian vertikal ±3–5 m dan <b>tidak menangkap tangga, trotoar, atau undakan</b>. Untuk penegasan keamanan, ukur ulang di lapangan (waterpass/laser) atau minta peta topografi dari pengelola kampus.</div>
+    </div>
+
+    <div class="panel" id="facPanel">
+      <h2>Fasilitas (peta panitia lapangan AMI 2026)</h2>
+      <div id="facList"></div>
+      <div class="warnbox">Posisi simbol diambil dari "Peta Simbol" Capanlap ITB Day AMI 2026 lalu diselaraskan ke model (ketelitian ±10 m; area Saraga/Sabuga lebih longgar). Klik tanah di mana saja untuk melihat titik kumpul terdekat.</div>
+    </div>
+    <div class="panel" id="gatePanel">
+      <h2>Gerbang kampus</h2>
+      <ul id="gateList" style="margin:0;padding:0;list-style:none;font-size:12px"></ul>
+      <p class="note">Jam, fungsi &amp; akses: "Daftar Gerbang" peta Capantour ITB Day AMI 2026. Status hidup/mati &amp; posisi: "Peta Simbol" Capanlap AMI 2026. Gerbang tanpa posisi bisa ditempatkan sendiri (tersimpan di peramban ini).</p>
+    </div>
+    <div class="panel" id="panel">
+      <h2>Atur booth &amp; fasilitas acara</h2>
+      <label>Jenis</label>
+      <select id="selType"></select>
+      <label>Nama / pengisi</label>
+      <input id="inName" type="text" placeholder="mis. HMIF, Booth STEI-K">
+      <div class="btns"><button id="bPlace">+ Taruh di peta</button></div>
+      <p class="note">Klik "Taruh di peta", lalu klik di jalan/area. Booth otomatis sejajar dan menghadap jalan terdekat. Kemiringan tanah di titik booth ikut ditampilkan.</p>
+      <div id="selBox" style="display:none">
+        <label id="selTitle">Terpilih</label>
+        <div id="selSlope" class="note" style="margin-top:2px"></div>
+        <div class="btns">
+          <button id="bRotL">⟲ 15°</button>
+          <button id="bRotR">⟳ 15°</button>
+          <button id="bMove">Pindah</button>
+          <button id="bImg">Pasang gambar</button>
+          <button id="bDel" class="warn">Hapus</button>
+        </div>
+      </div>
+      <ul id="list"></ul>
+      <div id="stats"></div>
+      <div class="btns">
+        <button id="bCopy">Salin data (JSON)</button>
+        <button id="bLoad">Muat data</button>
+        <button id="bClearAll" class="warn">Kosongkan</button>
+      </div>
+      <textarea id="ioText" placeholder="Tempel data JSON di sini lalu klik Muat data" style="display:none"></textarea>
+      <p class="note">Data tersimpan di peramban ini saja. Gunakan "Salin data" untuk membagikan susunan ke panitia lain.</p>
+    </div>
+  </div>
+  <input id="fileOne" type="file" accept="image/*" hidden>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* ======================= DATA KAMPUS (meter) =======================
+   Gedung & jalan: OpenStreetMap (© kontributor OpenStreetMap, ODbL), diunduh Nov 2026.
+   Elevasi: tile terrain Mapzen/AWS "terrarium" (gabungan SRTM 30 m dkk.), m di atas permukaan laut,
+            disampel tiap 20 m lalu dihaluskan. Ketelitian vertikal ±3–5 m; undakan & tangga tidak tertangkap.
+   Sumbu: x = barat -> timur, z = utara -> selatan, (0,0) ≈ Plaza Widya. y = tinggi relatif datum (Tugu Soekarno).
+   Tinggi gedung = jumlah lantai × 3,8 m (taksiran; OSM tidak mencantumkan tinggi). */
+var RAW = "Hsecondary|Jalan Tamansari|-226,368 -229,334 -235,312 -252,255 -264,199 -271,164 -274,125 -271,6 -269,-77 -265,-164 -265,-192 -263,-235 -259,-261 -248,-286 -240,-295 -225,-302 -140,-305 -62,-307 -22,-310 -7,-314 2,-317 92,-354 100,-366 110,-379 115,-386|\nHsecondary|Jalan Tamansari|-185,485 -197,466 -209,446 -216,433 -222,419 -226,398 -226,368|\nHtertiary|Jalan Dayang Sumbi|348,-345 278,-347 162,-351 148,-352 111,-354 92,-354|\nHtertiary|Jalan Dayang Sumbi|148,-352 135,-361 118,-381 115,-386|\nHtertiary|Jalan Ganesha|-226,368 -208,357 -188,347 -161,333 -131,323 -103,315 -69,307 -24,301 11,300 45,304 65,308 90,316 147,336 161,341 203,348 268,359 278,362|Jl. Ganesa\nHunclassified|Jalan Ciung Wanara|161,341 159,347 143,424 134,471 127,513|\nHresidential|Jalan Skanda|-24,301 -37,308 -56,332 -61,379 -59,395 -34,475|\nHresidential||-69,307 -67,309 -56,332|\nHservice||-8,253 -3,259 -2,267 -2,300|\nHservice||-13,301 -13,267 -13,259 -8,253|\nHservice||-8,163 -9,203 -9,216 -8,238 -8,253|Jalan A\nHservice|Jalan X ITB|-20,-288 -128,-282|Jalan 10\nHservice||-8,158 -37,159 -72,161 -78,158 -80,153 -84,61|\nHservice||61,58 62,98 62,130 62,150 56,155 39,156 -8,158|Jalan I\nHservice|Jalan G ITB|118,57 118,38 118,1 119,-10 118,-42 118,-66 118,-114 118,-148 118,-197 114,-225 112,-246 112,-257 111,-290 111,-354|Jalan G\nHservice|Jalan D ITB|-251,65 -250,46 -244,-39 -244,-65 -244,-103 -243,-145 -243,-188 -242,-229|Jalan D\nHservice|Jalan D ITB|-251,65 -251,131 -245,202 -244,212 -241,219 -236,225 -229,230 -199,242 -176,240|Jalan D\nHservice|Jalan I ITB|180,56 189,94 190,156 187,162 181,167 162,180 158,187 157,205|Jalan J\nHservice|Jalan I ITB|157,205 151,218 129,233 99,234 65,236 9,238 -8,238 -60,239 -90,240 -129,241 -176,240|Jalan 1\nHservice|Jalan C ITB|-176,240 -187,228 -195,210 -198,152 -199,65|Jalan C\nHservice|Jalan X ITB|111,-290 65,-289 -7,-288|Jalan 10\nHservice|Jalan X ITB|-128,-282 -223,-278 -230,-274 -236,-254 -242,-229|Jalan 10\nHservice|Jalan III ITB|-244,-39 -167,-40 -166,-64|Jalan 3\nHservice|Jalan V ITB|118,-197 58,-197 -14,-197 -71,-197 -127,-198|Jalan 5\nHservice|Jalan E ITB|-166,-64 -167,-93 -167,-150 -166,-174 -159,-188 -152,-195 -143,-197 -127,-198|Jalan E\nHservice|Jalan IX ITB|236,-250 112,-257|Jalan 9\nHservice|Jalan II ITB|-251,65 -199,65 -113,62 -84,61 -27,59 1,59 61,58 118,57 180,56|Jalan 2\nHservice|Jalan F ITB|-128,-306 -128,-282 -127,-198|Jalan F\nHservice|Jalan IV ITB|-166,-64 -124,-64 -69,-64 -14,-64 23,-65 61,-65 118,-66|Jalan 4\nHservice||180,56 193,55 201,52 206,46 216,-63|\nHservice|Jalan H ITB|236,-250 242,-245 244,-232 242,-225 233,-207 230,-191 222,-142 219,-103 216,-63|Jalan H\nHservice|Jalan VI ITB|62,98 70,97 189,94|Jalan 6\nHservice|Jalan VII ITB|118,-114 219,-103|Jalan 7\nHservice|Jalan VIII ITB|222,-142 118,-148|Jalan 8\nHservice||-199,65 -197,27|\nHservice||-113,40 -94,39 -47,37|\nHservice||-113,40 -113,62|\nHservice||20,58 20,40 23,37 70,38 118,38|\nHservice||118,15 177,15|\nHservice||178,4 177,15 177,29 180,56|\nHservice||130,244 130,304 135,312 148,317|\nHservice||148,242 148,332 147,336|\nHservice||-60,239 -60,296 -61,306|\nHservice||-62,-307 -62,-318 -66,-329 -78,-335 -115,-345 -151,-354 -201,-358 -241,-360 -260,-367 -279,-378 -306,-404 -330,-431 -364,-466|\nHservice||-158,-328 -103,-326 -86,-323 -62,-318|\nHservice||151,-218 140,-218 133,-207 118,-197|\nHservice||118,-186 148,-186|\nHservice||160,-282 162,-351|\nHservice||-77,-217 -78,-197|\nHservice||-143,-197 -143,-222|\nHservice||-265,-189 -243,-188|\nHpedestrian|Jalan X ITB|-7,-288 -20,-288|Jalan 10\nHfootway|Boulevard ITB|-1,216 -1,207 -1,162 -1,94|\nHfootway|Boulevard ITB|-16,216 -15,163 -10,94|\nHfootway||-16,216 -1,216|\nHfootway||-16,216 -25,231 -25,238 -19,246 -19,258 -24,264 -25,284 -24,291 -24,301|\nHfootway||-1,216 5,221 9,234 7,242 5,245 6,259 9,264 11,286 11,300|\nHfootway||11,290 -2,289 -13,289 -24,291|\nHfootway||-13,74 -13,59 -14,53|\nHfootway||-1,82 -1,59 1,53|\nHfootway||-11,-5 -11,15 -11,38|\nHfootway||-18,-5 -17,15 -18,38|\nHfootway||-8,-54 -8,-41 -8,-21|\nHfootway||-21,-54 -21,-42 -21,-20|\nHfootway||-14,-60 -14,-89 -14,-110 -14,-143 -14,-177 -14,-197 -14,-231|\nHfootway||-28,14 -17,15 -11,15 1,15|\nHfootway||-28,23 -27,59|\nHfootway||-38,-135 -70,-135|\nHfootway||-6,-136 11,-136 59,-136|\nHfootway||-24,-88 -33,-81 -69,-80|\nHfootway||-3,-89 4,-81 23,-81|\nHfootway||-71,-195 -71,-175 -70,-135 -71,-105 -69,-69|\nHfootway||58,-194 59,-136 61,-67|\nHfootway||-71,-200 -34,-201 -14,-201 6,-201 57,-201|\nHfootway||-5,-201 -5,-242 0,-242 0,-273 -5,-286 -22,-286|\nHfootway||-23,-207 -22,-241 -22,-269 -28,-277 -20,-288|\nHfootway||-1,162 71,160 70,143 70,97 70,58 70,23|\nHfootway||-198,152 -151,150 -87,150 -88,197 -60,196 -60,207 -42,207 -42,217 -16,216|\nHfootway||-87,150 -87,61|Jalan B\nHfootway||-87,61 -87,52 -94,52 -95,27|Jalan B\nHfootway||-196,18 -156,19 -156,-11 -155,-40|\nHfootway||-130,15 -156,11|\nHfootway||-131,-24 -131,-12 -156,-11|\nHfootway||-127,-199 -152,-197 -161,-190 -167,-175 -168,-136 -168,-64 -169,-40|\nHfootway||113,-62 114,-42 114,38 111,49 105,53 70,54 30,55|\nHfootway||164,206 162,331|\nHfootway||164,187 164,206|\nHfootway||268,365 169,349 146,341 104,328 69,315 50,310 31,306 23,310 16,313 -21,314 -37,308 -67,309 -129,328 -177,347 -197,358 -209,365|\nHfootway||273,349 229,345 179,336 148,327 96,309 64,298 26,291 11,290|\nHfootway||-24,291 -60,296 -127,309 -163,321 -193,333 -218,343|\nHfootway||111,-347 66,-339 13,-318 -7,-311 -30,-305 -128,-302 -219,-300 -240,-287 -252,-262 -257,-232 -260,-140 -265,138 -265,176 -254,231 -228,330 -220,343|\nHfootway||11,300 26,307 38,332 44,347 45,374 40,404 38,421|\nHcorridor|Koridor Labtek V|-95,24 -28,23 -28,14 -28,-4 -95,-4 -130,-4 -130,15 -130,24 -95,24|\nHcorridor||-95,27 -95,-4|\nHcorridor||-95,-4 -95,-13 -101,-13 -101,-24|\nHcorridor||1,15 1,24 70,23 100,23 100,6 100,-6 60,-6 1,-5 1,15|\nHcorridor||60,-27 106,-27 105,-55 60,-55 1,-55 1,-27 60,-27|\nHcorridor||-69,-53 -34,-53 -34,-24 -101,-24 -139,-24 -139,-53 -102,-53 -69,-53|\nHcorridor||-124,-80 -124,-129 -119,-142 -119,-175 -80,-175|\nHcorridor||-142,-136 -90,-136|\nHcorridor||-124,-98 -79,-98|\nHcorridor||-124,-126 -71,-126|\nHcorridor||-34,-24 -34,-16 -30,-16 -30,-4|\nHcorridor||5,-27 5,-16 1,-16 1,-5|\nHsteps||-14,-201 -14,-211|\nHsteps||-13,-262 -18,-262 -18,-272 -27,-276 -27,-281 -22,-286|\nHsteps||-13,-262 -8,-262 -8,-271 -3,-275 -3,-282 -5,-286|\nB|HMS|-190,157 -190,172 -164,172 -164,157|\nB4|School of Pharmacy ITB|1,-55 60,-55 105,-55 105,-28 60,-27 1,-27|49 \u00b7 Labtek VII \u2013 Yusuf Panigoro\nB1|Aula Barat ITB|-105,226 -105,209 -92,208 -92,198 -61,198 -60,209 -44,209 -43,222 -53,222 -53,235 -99,236 -99,226|82 \u00b7 Aula Barat\nB8|CRiMSE Building|-79,-284 -79,-269 -74,-269 -74,-209 -31,-209 -30,-276 -37,-278 -37,-283|17 \u00b7 Pusat Antar Universitas\nB3|Gedung Pertambangan FTTM|160,-221 156,-177 175,-175 179,-219|22 \u00b7 Gedung Teknik Perminyakan\nB3|Gedung Perminyakan FTTM|213,-163 214,-185 180,-186 180,-173 186,-173 186,-164|22 \u00b7 Gedung Teknik Perminyakan\nB4|Labtek IV|122,-249 205,-244 236,-241 235,-220 228,-221 229,-211 208,-212 208,-222 201,-223 120,-228|21 \u00b7 Labtek IV\nB1|Pengembangan SDA|-105,141 -105,127 -155,128 -155,142|\nB1|Teknik Sipil|-92,197 -92,176 -180,177 -180,198|81 \u00b7 Gedung Manajemen Rekayasa Konstruksi \u2013 KL Heritage\nB1|Fisika|-150,121 -167,121 -167,69 -151,68 -151,79 -105,78 -105,90 -151,91|60 \u00b7 Gedung Fisika\nB1|Teknik Sipil|-154,155 -91,155 -91,170 -154,170|80 \u00b7 Gedung Teknik Sipil\nB1|Fisika|-102,121 -87,120 -87,80 -102,80|\nB1|Fisika|-110,104 -110,119 -150,119 -151,104|\nB4|Labtek VI|-139,-24 -34,-24 -34,-53 -139,-53|45 \u00b7 Labtek VI \u2013 T.P Rahmat I\nB3|Lab Konversi Energi Listrik|-190,27 -136,27 -135,49 -190,50|44 \u00b7 Laboratorium Penelitian Konversi Energi Listrik\nB1|Lab Metrologi|-219,28 -201,27 -200,44 -218,45|\nB4|Labtek V|-130,-4 -28,-4 -28,23 -130,24|46 \u00b7 Labtek V \u2013 Benny Subianto I\nB4|GKU Barat|-208,-23 -196,-37 -175,-37 -162,-24 -161,-5 -173,9 -194,10 -208,-2|42 \u00b7 Gedung Kuliah Umum Barat (GKU B) \u2013 Wardah Foundation\nB1|Aula Timur|74,198 95,198 95,216 82,216 82,225 38,225 38,217 29,217 29,202 41,202 41,191 74,191|78 \u00b7 Aula Timur\nB2|Lab Energi Termal|-240,-145 -169,-144 -169,-101 -241,-103|13 \u00b7 Laboratorium Mesin \u2013 Lab Energi Termal, Motor Bakar, dan Sistem Propulsi\nB2|Oktagon|-27,-167 -27,-153 -43,-140 -53,-140 -67,-153 -68,-167 -54,-182 -43,-182|29 \u00b7 Oktagon\nB2|TVST|-26,-109 -43,-92 -54,-91 -70,-107 -70,-120 -57,-133 -42,-133 -27,-118|31 \u00b7 Gedung Televisi Siaran Terbatas \u2013 TVST\nB4|Labtek X|-80,-178 -91,-178 -91,-195 -139,-194 -124,-178 -152,-178 -152,-152 -80,-152|26 \u00b7 Labtek X\nB4|Labtek XI|-152,-126 -152,-98 -128,-98 -128,-80 -114,-80 -115,-98 -79,-98 -79,-126|28 \u00b7 Labtek XI\nB4|FTMD|-245,-65 -245,-45 -173,-44 -172,-72 -193,-72 -193,-63 -201,-63 -201,-69 -229,-70 -229,-65|\nB4|Gedung Kuliah Teknik Industri|-215,-199 -216,-183 -172,-182 -172,-198|\nB2|Labtek Biru|-142,-145 -142,-129 -90,-129 -90,-145|\nB4|Gedung Kuliah SBM|-221,-275 -222,-262 -139,-259 -138,-272|8 \u00b7 Labtek XIX \u2013 Gedung SBM\nB4|Gedung Kuliah Matematika|-160,-226 -161,-211 -232,-212 -232,-227|11 \u00b7 Labtek III \u2013 Matthias Aroef\nB1|Kantin East Corner|237,-203 236,-184 261,-181 262,-202|25 \u00b7 Kantin East Corner\nB6|Labtek IX C|127,102 181,100 181,124 128,125|69 \u00b7 Labtek IX C \u2013 Geodesi dan Geomatika\nB4|Labtek VIII|1,-5 100,-6 100,23 1,24|50 \u00b7 Labtek VIII \u2013 Achmad Bakrie\nB6|Labtek IX A|71,101 126,101 126,122 72,122|68 \u00b7 Labtek IX A \u2013 Gedung Sugijanto Soegijoko (Perencanaan Wilayah dan Kota)\nB4|Gedung Seni Rupa|81,144 126,144 126,164 81,164|71 \u00b7 Gedung Seni Rupa\nB6|Labtek IX B|128,139 181,138 182,161 129,163|72 \u00b7 Labtek IX B \u2013 Arsitektur\nB2|Lab Fisika Dasar|51,-167 51,-152 47,-146 11,-146 -2,-160 -3,-167 2,-172 48,-173|30 \u00b7 Laboratorium Fisika Terpadu\nB2|Gedung Kerjasama PLN|51,-107 51,-125 46,-129 11,-129 -2,-116 -2,-107 5,-102 46,-102|32 \u00b7 Gedung Kerjasama PLN-ITB\nB1||-100,129 -93,129 -93,140 -100,140|\nB2|Teknik Lingkungan|71,70 71,88 182,86 182,68|66 \u00b7 Gedung Teknik Lingkungan\nB2|Campus Center Timur|1,72 57,71 58,93 1,94|64 \u00b7 Gedung Campus Center Timur \u2013 Benny Subianto II\nB2|Labtek I|61,-180 87,-180 87,-105 61,-104|34 \u00b7 Labtek I \u2013 Mekanika Tanah\nB3|Campus Center Barat|-80,74 -31,74 -31,94 -80,94|61 \u00b7 Gedung Campus Center Barat\nB3|Gd. Rekayasa Molekular|131,-111 190,-106 189,-103 214,-101 213,-78 195,-80 129,-86 128,-96|51 \u00b7 Labtek XV \u2013 Gedung Rekayasa Molekular dan Material Fungsional \u2013 Gedung Kimia Baru\nB2|Lab Hidrolika|196,-39 196,-32 144,-31 144,-37 136,-37 137,-27 128,-27 124,-32 127,-60 201,-61 201,-40|53 \u00b7 Laboratorium Gelombang Teknik Kelautan \u2013 Laboratorium Hidrolik\nB3|Gedung Kimia Baru|130,-146 128,-121 200,-116 203,-140|37 \u00b7 Gedung Kimia\nB4|GKU Timur|143,-26 142,2 175,2 175,-3 208,-4 208,-28|54 \u00b7 Gedung Kuliah Umum Timur (GKU T) \u2013 Paragon Innovation / 55 \u00b7 Gedung Career Development Center\nB2|Masjid Salman|68,330 53,356 75,370 85,376 101,349|94 \u00b7 Masjid Salman ITB\nB4|Perpustakaan Pusat|50,-220 10,-220 10,-238 0,-238 0,-251 3,-251 3,-274 43,-274 43,-254 51,-254 51,-243 50,-243|19 \u00b7 Gedung Perpustakaan Pusat \u2013 T.P Rachmat II\nB1|Seni Rupa Tekstil|194,62 201,59 203,95 197,98|\nB1|Lab Struktur dan Bahan|64,-77 88,-77 87,-105 64,-104|35 \u00b7 Laboratorium Struktur Teknik Sipil\nB1|Selasar Planologi|72,128 88,127 88,140 72,140|\nB1|Bioskop Kampus LFM|68,162 68,180 44,180 43,162|74 \u00b7 Gedung LFM\nB4|Gedung SR|100,209 128,206 131,220 143,218 152,211 156,202 156,171 128,172 129,185 112,186 112,166 86,167 86,186 100,186|75 \u00b7 Center of Art and Design\nB6|Basic Science A|-248,132 -202,132 -202,154 -248,153|59 \u00b7 Basic Science Center A (BSC A)\nB4|Basic Science B|135,-174 133,-155 171,-152 171,-155 178,-155 179,-166 173,-167 173,-171|24 \u00b7 Basic Science Center B\nB1|Teknik Sipil|-192,134 -191,147 -157,147 -157,134|\nB1|Fisika|-173,66 -172,121 -189,122 -190,111 -192,111 -193,67|\nB2||-241,-207 -242,-190 -218,-189 -217,-206|\nB1|Information Centre|-16,83 -14,79 -10,77 -5,78 -2,82 -2,87 -6,90 -10,91 -14,89|63 \u00b7 Information Center\nB2|Kantor Pascasarjana SP|-169,-251 -168,-239 -145,-239 -145,-251|\nB1|ATM Center|16,201 16,178 40,178 40,164 2,164 2,201|73 \u00b7 ATM Center\nB4|Lab Doping|122,20 158,18 169,18 170,41 158,42 123,43|57 \u00b7 Laboratorium Doping\nB3|CADL|-122,-268 -86,-267 -87,-212 -123,-212|16 \u00b7 Center for Arts, Design, and Languange\nB4|CAS|67,-210 68,-282 100,-282 99,-210|20 \u00b7 Center for Advanced Sciences\nB2|CIBE|-247,75 -206,75 -206,122 -245,123|58 \u00b7 Labtek XIII \u2013 Center for Infrastructure and Built Environment (CIBE)\nB2|CRCS|121,-294 122,-271 157,-271 157,-295|7 \u00b7 Center for Research and Community Service\nB2|CRCS|115,-325 152,-325 153,-294 116,-294|\nB2||-186,-168 -188,-152 -170,-152 -170,-168|\nB1|Musholla|-292,303 -272,293 -262,314 -280,321|\nB1|IMG-ITB|197,98 197,107 202,107 203,96|\nB1|FTSL Administration|-50,245 -50,256 -36,255 -31,261 -27,255 -22,255 -22,244|83 \u00b7 Kantor Dekanat FTSL\nB1|FSRD|36,242 36,253 22,253 18,259 12,253 8,253 8,243|84 \u00b7 Kantor Dekanat FSRD\nB2|Kantin Barat Laut|-236,-253 -236,-234 -171,-235 -171,-253|9 \u00b7 Labtek XIV \u2013 Gedung Freeport\nB1|Sekretariat UKM Kesenian|-79,100 -78,137 -67,137 -68,100|\nB1|Galeri Soemardja|130,221 102,222 102,212 119,212 119,208 128,210 128,214 126,214 126,217 130,217|77 \u00b7 Galeri Soemardja\nB1||-240,-145 -246,-145 -246,-103 -240,-103|\nB2|Lab Fluida|-228,-98 -200,-97 -201,-69 -229,-70|14 \u00b7 Labtek II \u2013 Gedung FTMD\nB2|Lab Teknik Dirgantara|-244,-98 -245,-65 -229,-65 -229,-70 -228,-98|\nB4|FTMD|-240,-181 -240,-150 -170,-149 -169,-180|12 \u00b7 Gedung Pusat Pengembangan Teknologi dan Industri\nB1|Student Corner FTMD|-200,-97 -196,-97 -197,-69 -201,-69|\nB4|Prodi Teknik Telekomunikasi|-245,1 -212,0 -211,22 -244,22|39 \u00b7 Laboratorium Telekomunikasi Radio dan Gelombang Mikro \u2013 LTRGM\nB1|Pilotis Geodesi|181,124 167,124 167,138 181,138|70 \u00b7 Pilotis Geodesi\nB1|Amphitheater|-143,-10 -143,9 -150,8 -154,3 -155,-2 -153,-7 -147,-10|\nB1||-150,14 -150,22 -136,22 -136,14|\nB1||-144,91 -144,99 -131,99 -132,91|\nB1||185,10 186,50 200,49 199,9|56 \u00b7 Labtek XVII \u2013 Dato\u2019 Dr. Low Tuck Kwong\nB1||181,-216 203,-215 203,-208 212,-207 211,-198 205,-198 204,-190 180,-191|23 \u00b7 Gedung Riset dan Museum Energi dan Mineral\nB1||159,-279 159,-260 167,-260 167,-279|\nB1|Ruang Inspirasi Alumni|152,-76 152,-70 162,-70 162,-75|52 \u00b7 Ruang Inspirasi Alumni\nB1|Science Techno Park|-167,367 -148,359 -141,378 -160,385|\nB1|LPIK|-148,359 -127,352 -112,392 -126,396 -133,375 -141,378|89 \u00b7 Lembaga Pengembangan Inovasi dan Kewirausahaan ITB (LPIK ITB)\nB1|Rumah A|-105,340 -97,361 -80,355 -87,334|\nB2|Salman (selasar)|79,386 72,400 47,388 55,374 70,381|\nB1|Warung Pasta|210,311 207,325 228,330 232,316|\nB1||184,224 184,240 239,243 240,227|\nB1||27,-302 31,-300 36,-301 49,-301 49,-298 68,-297 68,-304 61,-307 37,-307 33,-311 29,-310 27,-305|5 \u00b7 Instalasi Air\nB1|Pos Polisi|90,-350 98,-353 99,-350 91,-347|\nB1||214,-308 213,-292 220,-292 219,-276 228,-276 230,-307|\nB1||-283,-347 -293,-334 -272,-319 -263,-331|\nB1||-276,377 -267,373 -262,382 -272,386|\nB1|TPS Taman Sari|-242,373 -235,373 -235,387 -242,384|\nB1||233,-313 232,-302 238,-302 237,-295 233,-295 232,-290 259,-288 261,-311|\nB1||252,-204 254,-230 299,-226 297,-201|\nB1||253,-97 292,-94 295,-120 256,-124|\nB1||248,-97 226,-99 224,-71 245,-69 246,-81 231,-83 232,-90 247,-88|\nB1||237,23 278,24 277,40 237,39|\nB1||219,63 279,68 278,86 217,81|\nB1||218,105 253,108 252,134 216,132|\nB1||238,135 264,138 262,162 236,159|\nB1||203,174 231,177 230,190 201,187|\nB1||198,208 250,212 249,227 197,224|\nB1||172,204 183,205 182,242 166,241 166,232 171,232|\nB1||169,269 244,270 250,275 250,295 166,295|\nB1||167,297 196,298 195,318 165,315|\nB1||201,297 231,299 230,308 200,315|\nB1||236,298 263,300 261,316 234,312|\nB1|Colombia|261,337 238,333 241,321 264,319|\nB1||250,-29 235,-22 237,-46 235,-59 283,-51 280,-21 260,-23|\nUgrass|Lapangan Sipil|-180,246 -180,315 -72,282 -70,260 -68,244 -90,244|\nUgrass|Lapangan SR|46,279 123,304 123,241 46,239|\nUgrass||-198,152 -151,150 -87,150 -88,197 -92,197 -92,208 -105,209 -105,226 -99,226 -99,236 -53,235 -52,239 -118,241 -176,240 -187,228 -195,210|\nUgrass||-2,-107 -2,-88 5,-83 22,-83 22,-102 5,-102|\nUgreenfield|Lapangan LFM|17,179 17,202 41,202 41,179|\nLpitch|Lapangan Basket dan Voli|-60,114 -59,133 -64,133 -65,159 -22,157 -24,112|\nLpark|Lapangan Cinta|-1,109 19,108 38,108 39,148 -1,149|\nLpark|Taman Ganesha|-38,313 -52,329 -53,331 -51,383 -33,472 13,473 22,472 39,389 40,353 37,332 29,315 24,312 -35,313|\nLpark|Taman Indonesia Tenggelam|-34,-53 1,-55 1,53 -35,55 -35,23 -28,23 -28,-4 -29,-22 -34,-24|\nLpark|ITB Green Pedestrian|-69,308 -58,332 -62,388 -39,474 -185,485 -213,427 -226,368 -178,345 -160,337|\nLpark|Salman Green Sideway|26,472 134,471 143,424 154,347 103,329 29,309 38,332 45,374 40,404 28,466|\nLpark|Taman Teknik Sipil|-17,165 -60,166 -65,180 -86,184 -86,191 -60,191 -54,201 -38,201 -31,192 -17,192|\nLpark|Lapangan Radar|-243,26 -243,45 -218,45 -219,28|\nLpark|Taman Parkir Sipil|-243,160 -204,161 -206,174 -231,173 -229,211 -218,215 -211,229 -229,226 -237,218|\nLpark|Taman Masjid Salman|29,309 70,317 154,347 147,380 127,373 107,391 85,379 102,348 67,329 52,356 44,347 30,313|\nLpark|Kebun Botani GKU Barat|-245,-38 -245,-1 -211,-1 -212,-26 -200,-38|\nLpark|DPR|-69,-79 -33,-80 -24,-88 -3,-88 4,-81 24,-80 23,-65 -69,-64|\nLpark|Lapangan Barrac|90,122 90,144 126,144 126,122|\nLpark|Taman Planologi|39,131 39,156 56,155 62,150 62,130 49,125 49,93 38,93 38,108|\nLpark|Taman Perminyakan|135,-224 114,-225 118,-197 118,-182 132,-184|\nLpark|Taman Segitiga|113,-376 128,-356 100,-357|\nLpark|Lapangan Bioskop Kampus|46,180 46,189 75,189 75,197 99,197 99,187 84,187 84,166 79,166 79,145 72,145 72,162 69,162 69,181|\nLpark||146,318 146,333 116,321 69,305 24,296 9,289 8,266 6,254 46,254 46,279 123,304 123,309|\nLpark||-26,259 -26,291 -33,298 -78,306 -127,314 -165,330 -215,349 -225,319 -246,256 -257,209 -257,35 -255,-183 -245,-183 -247,-82 -249,110 -248,216 -214,327 -180,315 -72,282 -70,260|\nLpark||-255,-183 -245,-183 -244,-229 -240,-253 -232,-276 -211,-284 -130,-290 -25,-296 -26,-306 -139,-297 -207,-291 -236,-284 -247,-267 -252,-251|\nLpark||-67,308 -54,328 -37,306|\nLpark||123,235 124,240 156,235 156,216 138,230|\nLpark||216,2 216,30 235,30 235,12 239,12 239,3|\nLpark||164,-349 314,-341 327,-338 332,-330 328,-242 319,-123 301,38 279,260 272,339 265,349 248,351 168,339 150,335 150,318 224,335 261,340 268,278 281,135 298,-32 315,-190 320,-322 309,-329 171,-340|\nLgarden||-99,-23 -99,-19 -94,-19 -94,-4 -34,-4 -34,-10 -39,-9 -39,-23|\nLgarden|Taman TOKA|7,-27 7,-5 46,-6 46,-27|\nLgarden||11,-146 47,-146 51,-152 55,-152 55,-138 11,-138|\nLgarden||-2,-116 -2,-121 12,-134 55,-135 56,-125 46,-129 11,-129|\nLcommon|Lapangan Amphi Arsi|128,125 167,124 167,138 128,139|\nUallotments|Taman Utara|110,-353 92,-354 7,-320 -7,-314 -7,-288 65,-289 108,-290 111,-290|\nUallotments||-160,-93 -128,-93 -128,-80 -114,-80 -115,-93 -71,-94 -71,-70 -160,-70|\nNwater|Kolam Taman Ganesha|-7,388 -7,430 -13,435 -14,441 -11,448 -7,452 -6,458 5,458 4,452 10,449 11,444 10,435 4,430 3,389 7,385 9,380 9,376 4,371 2,351 -8,351 -8,371 -12,377 -12,383 -10,386|\nNwater|Kolam Mesin|-191,-94 -173,-93 -173,-75 -192,-75|\nAfountain|Kolam Indonesia Tenggelam|-15,-21 -10,-19 -8,-15 -9,-11 -14,-9 -18,-10 -20,-15 -18,-19|\nAfountain||-15,-48 -13,-48 -13,-43 -15,-43|\nAfountain||-15,-40 -13,-40 -13,-26 -15,-26|\nMmonument|Tugu Soekarno|-14,46|\nAparking|Parkir Sipil|-230,251 -180,246 -180,315 -212,322|\nAparking|Parkir SR|123,241 123,304 154,316 156,236|\nAparking|Parkir Sabuga|-97,-338 -69,-328 -69,-312 -143,-312 -144,-338|\nAparking||-121,31 -38,31 -38,47 -122,47|\nAparking||3,32 4,54 64,53 63,32|\nAparking||75,31 75,50 95,50 95,31|\nAparking||24,-98 55,-98 55,-68 24,-69|\nAparking||-37,-192 -37,-186 -65,-186 -65,-192|\nAparking||-72,-208 -72,-201 -38,-201 -38,-208|\nAparking||-231,173 -206,174 -199,174 -199,229 -211,229 -218,215 -229,211|\nAparking||49,93 58,93 59,129 49,125|\nAparking||-84,166 -66,167 -67,177 -85,181|\nAparking||123,-20 142,-20 141,-2 123,-2|\nAparking||135,-224 132,-184 154,-182 158,-223|\nAparking||-131,-230 -156,-230 -156,-199 -131,-201|\nAparking||-122,-207 -79,-207 -79,-199 -122,-198|\nAfood_court|Taman Sari Food Fest|-143,-312 -224,-308 -237,-304 -237,-339 -144,-338|\nHsteps|Tangga Taman Hewan|-225,349 -231,354 -265,360 -287,365|\nHsteps||-21,-54 -14,-60|\nHsteps||-14,-60 -8,-54|\nHsteps||-14,-195 -14,-188|\nHsteps||-14,-188 -14,-177|\nHsteps||-29,-179 -25,-177|\nHsteps||-34,-195 -34,-191|\nHsteps||-34,-191 -34,-185 -29,-179|\nHsteps||6,-195 6,-190|\nHsteps||6,-190 6,-185 1,-180|\nHsteps||-4,-177 1,-180|\nHsteps||-69,-60 -69,-53|\nHsteps||-197,27 -196,18|\nHsteps||-138,-11 -156,-11|\nHsteps||-124,-53 -124,-62|\nHsteps||61,-61 60,-55|\nHsteps||-5,-207 -5,-201|\nHsteps||-23,-207 -23,-201|\nHsteps||-17,-234 -13,-238 -16,-241|\nHsteps||-14,-276 -13,-262|\nHsteps||-10,94 -13,94 -17,92 -19,90 -21,87 -21,84|\nHsteps||-1,82 -1,87 -3,90 -6,93 -10,94|\nHsteps||-191,-358 -186,-338|\nHsteps||-20,-291 -20,-292|";
+var ELEV = "7516,7539,7571,7603,7626,7626,7619,7610,7622,7639,7640,7646,7648,7638,7638,7642,7671,7701,7733,7764,7799,7832,7863,7870,7866,7875,7880,7880,7863,7860,7860,7867,7867,7856,7850\n7516,7539,7571,7603,7626,7626,7619,7610,7622,7639,7640,7646,7648,7638,7638,7642,7671,7701,7733,7764,7799,7832,7863,7870,7866,7875,7880,7880,7863,7860,7860,7867,7867,7856,7850\n7516,7539,7571,7603,7626,7626,7619,7610,7622,7639,7640,7646,7648,7638,7638,7642,7671,7701,7733,7764,7799,7832,7863,7870,7866,7875,7880,7880,7863,7860,7860,7867,7867,7856,7850\n7516,7539,7571,7603,7626,7626,7619,7610,7622,7639,7640,7646,7648,7638,7638,7642,7671,7701,7733,7764,7799,7832,7863,7870,7866,7875,7880,7880,7863,7860,7860,7867,7867,7856,7850\n7516,7539,7571,7603,7626,7626,7619,7610,7622,7639,7640,7646,7648,7638,7638,7642,7671,7701,7733,7764,7799,7832,7863,7870,7866,7875,7880,7880,7863,7860,7860,7867,7867,7856,7850\n7516,7539,7571,7603,7626,7626,7619,7610,7622,7639,7640,7646,7648,7638,7638,7642,7671,7701,7733,7764,7799,7832,7863,7870,7866,7875,7880,7880,7863,7860,7860,7867,7867,7856,7850\n7516,7539,7571,7603,7626,7626,7619,7610,7622,7639,7640,7646,7648,7638,7638,7642,7671,7701,7733,7764,7799,7832,7863,7870,7866,7875,7880,7880,7863,7860,7860,7867,7867,7856,7850\n7528,7547,7575,7597,7629,7637,7622,7618,7626,7637,7640,7638,7626,7626,7629,7651,7670,7690,7722,7752,7791,7825,7861,7863,7853,7860,7874,7870,7861,7860,7861,7860,7859,7850,7846\n7535,7543,7560,7586,7617,7619,7609,7615,7626,7637,7641,7631,7622,7622,7629,7646,7672,7696,7725,7747,7793,7827,7852,7853,7839,7839,7849,7855,7857,7857,7857,7857,7857,7846,7839\n7545,7539,7558,7579,7600,7602,7602,7612,7624,7637,7644,7638,7637,7634,7633,7638,7666,7703,7741,7765,7805,7841,7850,7837,7824,7821,7834,7848,7849,7849,7845,7849,7845,7839,7836\n7569,7556,7578,7596,7602,7600,7597,7604,7625,7641,7651,7662,7664,7654,7644,7643,7667,7710,7766,7806,7836,7856,7849,7828,7809,7816,7835,7848,7850,7852,7840,7846,7840,7836,7823\n7608,7609,7626,7639,7637,7621,7610,7622,7648,7657,7668,7692,7702,7688,7665,7663,7701,7744,7787,7835,7858,7861,7850,7828,7812,7828,7844,7849,7852,7846,7836,7834,7835,7823,7820\n7654,7666,7685,7690,7687,7668,7657,7671,7691,7697,7707,7722,7742,7731,7707,7713,7750,7781,7806,7836,7859,7849,7841,7836,7832,7837,7850,7847,7841,7836,7824,7824,7824,7820,7813\n7692,7706,7734,7746,7738,7731,7730,7733,7753,7761,7761,7770,7785,7785,7778,7782,7799,7805,7821,7832,7840,7843,7839,7841,7841,7841,7843,7838,7817,7817,7814,7813,7813,7814,7810\n7718,7739,7770,7786,7791,7797,7798,7789,7804,7814,7811,7812,7821,7823,7825,7817,7820,7818,7814,7823,7826,7834,7837,7841,7841,7835,7833,7826,7811,7801,7802,7803,7804,7803,7796\n7732,7763,7795,7818,7829,7833,7828,7822,7820,7821,7827,7834,7845,7846,7839,7828,7819,7819,7809,7813,7816,7822,7827,7835,7833,7832,7823,7820,7812,7808,7801,7793,7784,7785,7773\n7751,7785,7814,7838,7848,7837,7827,7816,7811,7817,7827,7845,7856,7867,7849,7838,7836,7827,7816,7799,7806,7813,7813,7813,7817,7828,7830,7823,7811,7812,7794,7782,7772,7762,7762\n7773,7796,7815,7827,7831,7816,7811,7805,7799,7808,7817,7844,7867,7879,7868,7857,7849,7838,7819,7807,7800,7798,7791,7795,7812,7828,7831,7822,7811,7803,7782,7771,7760,7760,7761\n7773,7783,7795,7802,7800,7805,7812,7804,7799,7800,7806,7833,7865,7888,7889,7880,7850,7829,7810,7811,7803,7784,7778,7790,7813,7828,7830,7831,7815,7793,7781,7770,7769,7760,7761\n7762,7770,7772,7785,7790,7794,7806,7812,7804,7799,7807,7824,7862,7898,7891,7861,7829,7809,7801,7809,7796,7785,7779,7784,7802,7818,7820,7821,7804,7791,7781,7780,7770,7760,7760\n7760,7759,7762,7772,7789,7801,7804,7811,7803,7798,7806,7816,7833,7864,7859,7829,7809,7799,7799,7800,7797,7784,7779,7784,7802,7818,7822,7805,7791,7780,7779,7770,7759,7758,7749\n7748,7750,7751,7766,7789,7801,7800,7793,7787,7789,7788,7795,7806,7804,7805,7797,7798,7788,7790,7790,7785,7779,7780,7784,7802,7818,7821,7805,7781,7769,7758,7759,7749,7739,7738\n7740,7750,7751,7762,7776,7789,7789,7783,7779,7780,7778,7778,7776,7779,7779,7777,7777,7779,7790,7787,7780,7774,7771,7785,7804,7818,7813,7785,7760,7749,7750,7748,7739,7739,7730\n7728,7738,7741,7752,7762,7771,7777,7779,7780,7781,7774,7769,7771,7779,7781,7772,7772,7769,7777,7777,7775,7762,7762,7787,7815,7814,7804,7777,7752,7750,7750,7742,7744,7742,7745\n7709,7734,7738,7745,7763,7758,7762,7774,7780,7780,7782,7774,7780,7780,7780,7781,7781,7772,7769,7770,7763,7759,7772,7791,7803,7810,7806,7778,7753,7747,7751,7751,7762,7754,7766\n7707,7735,7743,7751,7761,7759,7760,7761,7775,7780,7779,7781,7780,7780,7780,7780,7780,7781,7769,7766,7758,7763,7772,7782,7795,7807,7803,7774,7750,7737,7743,7747,7757,7762,7768\n7718,7738,7760,7766,7764,7764,7762,7759,7773,7784,7781,7780,7781,7780,7781,7780,7781,7776,7769,7758,7761,7759,7761,7770,7787,7794,7787,7763,7739,7727,7724,7732,7743,7758,7750\n7730,7750,7765,7772,7771,7772,7767,7770,7782,7790,7784,7776,7777,7777,7776,7780,7776,7764,7766,7761,7760,7760,7760,7763,7769,7772,7764,7745,7728,7715,7716,7710,7721,7737,7726\n7730,7749,7757,7767,7770,7770,7769,7775,7788,7792,7780,7767,7759,7758,7764,7776,7763,7760,7753,7755,7762,7763,7757,7751,7748,7748,7746,7733,7716,7710,7705,7693,7698,7709,7713\n7722,7736,7753,7763,7771,7769,7772,7777,7787,7789,7770,7755,7749,7748,7753,7757,7760,7753,7750,7756,7771,7774,7757,7742,7738,7740,7735,7734,7713,7710,7701,7690,7689,7694,7705\n7722,7740,7753,7765,7771,7772,7780,7780,7784,7780,7759,7749,7750,7750,7750,7749,7754,7750,7752,7771,7780,7779,7761,7744,7741,7738,7726,7724,7712,7710,7701,7690,7690,7690,7694\n7730,7743,7755,7762,7765,7774,7774,7775,7769,7760,7745,7748,7750,7750,7750,7750,7742,7743,7753,7767,7776,7771,7754,7735,7734,7728,7715,7713,7711,7711,7701,7690,7690,7690,7690\n7728,7741,7744,7756,7762,7759,7754,7755,7754,7745,7738,7748,7751,7751,7750,7750,7739,7740,7736,7746,7750,7751,7742,7731,7717,7708,7704,7695,7702,7704,7701,7689,7689,7690,7691\n7708,7737,7749,7750,7753,7747,7740,7741,7742,7741,7740,7742,7742,7741,7750,7750,7749,7730,7721,7724,7736,7742,7737,7721,7706,7689,7682,7682,7683,7682,7691,7699,7699,7689,7690\n7699,7747,7757,7749,7747,7739,7741,7735,7730,7731,7732,7730,7739,7740,7741,7750,7741,7729,7719,7719,7723,7738,7733,7709,7689,7673,7670,7671,7670,7678,7688,7700,7700,7698,7700\n7702,7759,7768,7755,7750,7746,7734,7731,7724,7720,7721,7720,7728,7740,7740,7741,7730,7730,7729,7730,7729,7731,7727,7710,7687,7672,7670,7670,7670,7678,7698,7709,7709,7710,7710\n7690,7740,7762,7760,7757,7746,7734,7731,7718,7709,7709,7718,7720,7728,7739,7740,7740,7740,7739,7729,7730,7731,7721,7704,7694,7684,7672,7670,7670,7679,7689,7709,7710,7710,7710\n7659,7722,7755,7760,7762,7751,7739,7737,7717,7709,7709,7718,7720,7729,7730,7739,7740,7740,7738,7730,7726,7718,7716,7703,7702,7687,7680,7672,7678,7679,7689,7699,7709,7698,7689\n7642,7712,7743,7753,7760,7756,7744,7742,7730,7713,7709,7717,7730,7730,7729,7729,7728,7729,7729,7728,7709,7696,7699,7698,7700,7696,7683,7681,7671,7669,7678,7688,7687,7678,7677\n7641,7700,7737,7751,7748,7749,7751,7755,7740,7724,7712,7716,7727,7730,7719,7717,7708,7717,7719,7714,7694,7689,7690,7689,7694,7702,7694,7682,7672,7670,7670,7667,7668,7668,7657\n7647,7687,7721,7735,7736,7742,7754,7761,7750,7726,7710,7707,7716,7718,7708,7697,7698,7697,7705,7699,7697,7689,7690,7691,7689,7696,7694,7683,7671,7669,7670,7660,7657,7657,7647\n7643,7671,7692,7709,7719,7733,7744,7748,7741,7714,7696,7693,7706,7707,7700,7689,7689,7689,7689,7700,7697,7689,7691,7689,7688,7687,7688,7681,7672,7670,7671,7660,7649,7647,7636\n7612,7648,7681,7703,7714,7729,7739,7735,7713,7687,7676,7675,7692,7699,7700,7693,7694,7694,7693,7689,7695,7689,7690,7680,7676,7676,7678,7668,7666,7667,7667,7661,7650,7634,7624\n7578,7626,7669,7692,7707,7719,7726,7712,7691,7671,7669,7684,7694,7703,7703,7704,7701,7701,7700,7693,7690,7690,7684,7672,7665,7666,7664,7657,7659,7659,7659,7656,7650,7632,7622\n7561,7620,7663,7680,7689,7708,7714,7703,7693,7680,7685,7706,7721,7716,7715,7717,7700,7699,7699,7706,7706,7694,7692,7681,7667,7657,7645,7642,7653,7660,7661,7650,7650,7640,7635\n7542,7597,7634,7663,7684,7701,7709,7708,7706,7704,7704,7718,7733,7722,7722,7711,7695,7703,7707,7718,7727,7716,7709,7695,7678,7665,7647,7643,7648,7660,7661,7649,7650,7645,7646\n7506,7559,7603,7639,7674,7689,7700,7709,7712,7713,7712,7714,7719,7717,7711,7694,7685,7690,7708,7724,7732,7731,7724,7708,7696,7684,7663,7653,7650,7652,7660,7656,7649,7651,7650\n7472,7520,7576,7631,7665,7679,7688,7701,7701,7697,7699,7698,7698,7692,7681,7679,7668,7675,7697,7717,7726,7723,7717,7715,7708,7690,7662,7643,7649,7656,7660,7661,7657,7651,7651\n7458,7500,7548,7601,7637,7663,7678,7684,7676,7673,7667,7664,7664,7663,7653,7644,7643,7654,7676,7697,7702,7689,7684,7685,7686,7673,7646,7640,7641,7650,7660,7660,7652,7641,7642\n7455,7489,7523,7567,7609,7643,7657,7663,7656,7644,7641,7640,7649,7651,7641,7630,7630,7641,7653,7665,7670,7657,7648,7642,7644,7637,7625,7621,7629,7640,7651,7651,7641,7640,7639\n7453,7464,7492,7534,7581,7627,7647,7651,7645,7633,7629,7638,7640,7640,7640,7640,7640,7639,7631,7641,7642,7633,7614,7610,7611,7605,7592,7597,7609,7619,7629,7640,7640,7650,7638\n7433,7451,7469,7513,7559,7611,7637,7641,7633,7629,7630,7638,7641,7640,7650,7651,7650,7628,7621,7631,7626,7614,7610,7605,7594,7582,7580,7580,7587,7607,7619,7639,7651,7660,7649\n7413,7434,7458,7492,7538,7588,7620,7629,7630,7630,7638,7641,7639,7648,7659,7659,7648,7628,7619,7619,7616,7608,7610,7606,7587,7579,7580,7580,7588,7598,7617,7639,7661,7672,7682\n7414,7434,7458,7489,7524,7562,7587,7610,7626,7638,7641,7640,7640,7638,7635,7636,7627,7617,7606,7599,7605,7597,7598,7593,7582,7579,7580,7590,7591,7599,7609,7628,7658,7681,7691\n7416,7436,7454,7477,7510,7541,7574,7601,7623,7637,7639,7638,7629,7615,7606,7603,7604,7595,7585,7588,7586,7589,7583,7578,7571,7575,7588,7599,7601,7600,7608,7616,7637,7666,7675\n7424,7444,7455,7469,7499,7531,7563,7596,7623,7628,7627,7618,7606,7585,7582,7574,7573,7573,7567,7579,7580,7579,7581,7574,7570,7577,7588,7599,7600,7600,7597,7596,7612,7633,7643";
+var REF = {"amiPoints":[{"n":1,"name":"Sasana Budaya Ganesha","x":-241.5,"z":-477.5},{"n":2,"name":"Lapangan Sarana Olahraga Ganesha","x":-156.6,"z":-535.7},{"n":2,"name":"Lapangan Sarana Olahraga Ganesha","x":-156.1,"z":-506.4},{"n":2,"name":"Lapangan Sarana Olahraga Ganesha","x":-154.9,"z":-457.8},{"n":2,"name":"Lapangan Sarana Olahraga Ganesha","x":-153.7,"z":-420.3},{"n":2,"name":"Lapangan Sarana Olahraga Ganesha","x":-82.6,"z":-473.2},{"n":2,"name":"Lapangan Sarana Olahraga Ganesha","x":3.8,"z":-511.6},{"n":2,"name":"Lapangan Sarana Olahraga Ganesha","x":2.6,"z":-469.3},{"n":2,"name":"Lapangan Sarana Olahraga Ganesha","x":0.6,"z":-430.2},{"n":3,"name":"Kolam renang Sarana Olahraga Ganesha","x":26.7,"z":-473.8},{"n":6,"name":"Coworking Space","x":14.8,"z":-301.2},{"n":15,"name":"Teras FTMD","x":-183.7,"z":-84.9},{"n":18,"name":"Sunken Court","x":-18.0,"z":-238.7},{"n":27,"name":"Selasar Labtek X dan Labtek XI – Selasar Labtek Biru","x":-121.0,"z":-135.7},{"n":33,"name":"Dibawah Pohon Rindang – DPR","x":-17.2,"z":-72.3},{"n":38,"name":"Kebun Botani SITH","x":-233.1,"z":-27.8},{"n":41,"name":"Lapangan Radar","x":-231.0,"z":43.5},{"n":43,"name":"Amphitheater","x":-144.9,"z":18.7},{"n":47,"name":"Plaza Widya Nusantara","x":-16.6,"z":-55.9},{"n":48,"name":"Kolam Indonesia Tenggelam – Kolam Intel","x":-15.4,"z":-10.8},{"n":62,"name":"Lapangan Basket dan Voli","x":-39.1,"z":127.6},{"n":65,"name":"Lapangan Cinta – Lapangan Segitiga","x":26.3,"z":126.8},{"n":76,"name":"Lapangan Merah","x":123.2,"z":176.6},{"n":79,"name":"Benteng Sipil","x":-213.0,"z":226.3},{"n":85,"name":"ITB Innovation Park Ganesha","x":-172.3,"z":384.7},{"n":86,"name":"Bank BNI","x":-190.3,"z":410.7},{"n":87,"name":"Villa Merah (BPUDL ITB)","x":-166.7,"z":457.5},{"n":88,"name":"ITB Press Store","x":-167.9,"z":410.6},{"n":90,"name":"Master of Business Administration ITB (MBA ITB)","x":-131.9,"z":431.0},{"n":90,"name":"Master of Business Administration ITB (MBA ITB)","x":-124.7,"z":464.1},{"n":91,"name":"Rumah A ITB","x":-76.3,"z":370.3},{"n":92,"name":"PT. LAPI ITB","x":-79.8,"z":416.9},{"n":93,"name":"PT. ZHARSYS AMANAH MANDIRI","x":-71.2,"z":463.8},{"n":95,"name":"Komplek Salman ITB","x":94.7,"z":422.7},{"n":96,"name":"Taman Ganesha","x":-2.8,"z":365.5},{"n":4,"name":"Single Academic Service (SAS)","x":-155.7,"z":-282.2},{"n":36,"name":"Bunker Kimia","x":96.4,"z":-109.5},{"n":40,"name":"Bunker Metrologi","x":-231.8,"z":25.1},{"n":10,"name":"Kantin Dalaraos","x":-161.0,"z":-238.4},{"n":67,"name":"Sekretariat Geodesi","x":213.5,"z":96.6}],"north":[{"name":"Lapangan Sipil Selatan","x":-99.3,"z":277.8},{"name":"Taman Alat Meteorologi","x":-100.4,"z":-80.0},{"name":"Rumah Kawat SITH","x":-144.3,"z":-92.3},{"name":"Amphitheatre SBM","x":-224.4,"z":-266.7},{"name":"Kresna SBM","x":-159.2,"z":-292.9},{"name":"Sunken Court","x":-14.2,"z":-264.6},{"name":"Wisma Ganesha (103)","x":246.8,"z":-232.8},{"name":"Instalasi Pengolahan Air ITB","x":49.6,"z":-306.9},{"name":"Menara Air","x":15.3,"z":-316.4},{"name":"Monumen Kubus","x":-3.4,"z":312.8},{"name":"Tugu Teman","x":-8.7,"z":-9.4},{"name":"Tugu Pintu","x":-21.1,"z":-315.3},{"name":"CWS Utara","x":57.2,"z":-330.7},{"name":"CWS Timur","x":176.1,"z":-196.4},{"name":"Lapangan Tennis I","x":-158.0,"z":-533.9},{"name":"Lapangan Basket I","x":-160.4,"z":-498.4},{"name":"Lapangan Tennis II","x":-161.7,"z":-419.7},{"name":"Lapangan Basket II","x":-163.1,"z":-454.4},{"name":"Lapangan Pickleball","x":-14.8,"z":-500.6},{"name":"Lapangan Futsal","x":-14.2,"z":-476.1}],"syms":[{"t":"TOILET 24 JAM","x":-183.5,"z":-193.5},{"t":"TOILET 24 JAM","x":-38.3,"z":-246.0},{"t":"TOILET 24 JAM","x":-214.5,"z":-206.1},{"t":"TOILET 24 JAM","x":-179.3,"z":-58.3},{"t":"TOILET 24 JAM","x":-192.1,"z":-27.9},{"t":"TOILET 24 JAM","x":35.9,"z":-494.1},{"t":"TOILET 24 JAM","x":25.5,"z":-444.9},{"t":"TOILET 24 JAM","x":34.0,"z":-444.9},{"t":"TOILET 24 JAM","x":-73.7,"z":-579.0},{"t":"TOILET 24 JAM","x":-171.3,"z":-549.3},{"t":"TOILET 24 JAM","x":-168.7,"z":-515.1},{"t":"TOILET 24 JAM","x":-221.4,"z":-531.7},{"t":"TOILET 24 JAM","x":-250.3,"z":-516.1},{"t":"TOILET 24 JAM","x":-250.3,"z":-457.7},{"t":"TOILET 24 JAM","x":-182.4,"z":-450.1},{"t":"TOILET 24 JAM","x":-203.6,"z":-391.4},{"t":"TOILET 24 JAM","x":-72.9,"z":-355.5},{"t":"TOILET 24 JAM","x":-219.6,"z":-72.7},{"t":"TOILET 24 JAM","x":-98.9,"z":215.3},{"t":"TOILET 24 JAM","x":-29.2,"z":222.7},{"t":"TOILET 24 JAM","x":9.5,"z":210.8},{"t":"TOILET 24 JAM","x":125.4,"z":142.7},{"t":"TOILET 24 JAM","x":147.1,"z":147.9},{"t":"TOILET 24 JAM","x":135.1,"z":119.7},{"t":"TOILET 24 JAM","x":90.2,"z":89.2},{"t":"TOILET 24 JAM","x":49.7,"z":87.1},{"t":"TOILET 24 JAM","x":-68.7,"z":100.3},{"t":"TOILET 24 JAM","x":-84.9,"z":7.1},{"t":"TOILET 24 JAM","x":67.6,"z":1.2},{"t":"TOILET 24 JAM","x":-97.5,"z":-27.9},{"t":"TOILET 24 JAM","x":80.9,"z":-32.5},{"t":"TOILET 24 JAM","x":139.5,"z":25.0},{"t":"TOILET NON 24","x":-64.6,"z":-221.4},{"t":"TOILET NON 24","x":14.9,"z":-253.8},{"t":"TOILET NON 24","x":11.6,"z":-222.3},{"t":"TOILET NON 24","x":87.5,"z":-247.9},{"t":"TOILET NON 24","x":-102.0,"z":-221.4},{"t":"TOILET NON 24","x":155.6,"z":-214.8},{"t":"TOILET NON 24","x":184.2,"z":-178.5},{"t":"TOILET NON 24","x":214.6,"z":-202.7},{"t":"TOILET NON 24","x":137.8,"z":-142.1},{"t":"TOILET NON 24","x":172.7,"z":-123.0},{"t":"TOILET NON 24","x":138.5,"z":-266.0},{"t":"TOILET NON 24","x":122.1,"z":-295.7},{"t":"TOILET NON 24","x":-204.9,"z":-239.7},{"t":"TOILET NON 24","x":-226.9,"z":-168.1},{"t":"TOILET NON 24","x":-228.4,"z":-134.1},{"t":"TOILET NON 24","x":-104.7,"z":-97.2},{"t":"TOILET NON 24","x":-107.3,"z":-151.5},{"t":"TOILET NON 24","x":-58.9,"z":-154.3},{"t":"TOILET NON 24","x":-55.0,"z":-137.7},{"t":"TOILET NON 24","x":-59.7,"z":-106.4},{"t":"TOILET NON 24","x":-57.1,"z":-83.7},{"t":"TOILET NON 24","x":8.3,"z":-148.1},{"t":"TOILET NON 24","x":68.3,"z":-134.7},{"t":"TOILET NON 24","x":68.5,"z":-101.7},{"t":"TOILET NON 24","x":-235.3,"z":110.0},{"t":"TOILET 24 JAM","x":-173.2,"z":-16.2},{"t":"TOILET NON 24","x":-180.8,"z":96.8},{"t":"TOILET NON 24","x":-169.2,"z":121.7},{"t":"TOILET NON 24","x":-159.3,"z":127.1},{"t":"TOILET NON 24","x":-149.6,"z":81.6},{"t":"TOILET NON 24","x":-141.7,"z":95.0},{"t":"TOILET NON 24","x":-132.3,"z":116.8},{"t":"TOILET NON 24","x":-114.4,"z":85.7},{"t":"TOILET NON 24","x":-137.9,"z":162.3},{"t":"TOILET NON 24","x":-162.8,"z":176.6},{"t":"TOILET NON 24","x":-108.3,"z":182.6},{"t":"TOILET NON 24","x":113.0,"z":212.2},{"t":"TOILET NON 24","x":97.3,"z":124.2},{"t":"TOILET NON 24","x":81.7,"z":89.5},{"t":"TOILET NON 24","x":145.9,"z":-43.3},{"t":"TOILET NON 24","x":28.2,"z":-488.3},{"t":"PARKIR MOBIL","x":-313.7,"z":-411.2},{"t":"PARKIR MOBIL","x":-360.0,"z":-410.0},{"t":"PARKIR MOBIL","x":-234.1,"z":-396.9},{"t":"PARKIR MOBIL","x":-190.6,"z":-434.8},{"t":"PARKIR MOBIL","x":-190.2,"z":-535.7},{"t":"PARKIR MOBIL","x":-13.1,"z":-480.7},{"t":"PARKIR MOBIL","x":35.2,"z":-412.3},{"t":"PARKIR MOBIL","x":-234.8,"z":-270.9},{"t":"PARKIR MOBIL","x":-195.5,"z":-272.4},{"t":"PARKIR MOBIL","x":-198.9,"z":-229.6},{"t":"PARKIR MOBIL","x":-260.2,"z":-160.9},{"t":"PARKIR MOBIL","x":-168.4,"z":-56.7},{"t":"APOTEK","x":89.8,"z":1.1},{"t":"PARKIR MOBIL","x":-238.3,"z":7.9},{"t":"PARKIR MOBIL","x":-269.1,"z":44.2},{"t":"PARKIR MOBIL","x":-267.7,"z":88.9},{"t":"PARKIR MOBIL","x":-265.6,"z":147.7},{"t":"PARKIR MOBIL","x":-188.8,"z":175.8},{"t":"TITIK KUMPUL","x":-140.9,"z":-294.6},{"t":"TITIK KUMPUL","x":-212.1,"z":-281.2},{"t":"TITIK KUMPUL","x":-136.1,"z":-210.4},{"t":"TITIK KUMPUL","x":-141.9,"z":-184.5},{"t":"TITIK KUMPUL","x":-261.5,"z":-171.9},{"t":"TITIK KUMPUL","x":-260.8,"z":-144.5},{"t":"TITIK KUMPUL","x":-247.5,"z":-36.7},{"t":"TITIK KUMPUL","x":-268.0,"z":96.8},{"t":"KOPERASI","x":-223.5,"z":-258.4},{"t":"TITIK KUMPUL","x":-206.1,"z":202.6},{"t":"KOPERASI","x":-188.6,"z":5.8},{"t":"TITIK KUMPUL","x":-130.9,"z":221.8},{"t":"TITIK KUMPUL","x":-74.3,"z":262.4},{"t":"TITIK KUMPUL","x":78.5,"z":270.9},{"t":"TITIK KUMPUL","x":-40.3,"z":170.7},{"t":"PARKIR MOBIL","x":-122.0,"z":254.9},{"t":"SPOT FOTO","x":-1.0,"z":332.5},{"t":"SPOT FOTO","x":-1.7,"z":311.4},{"t":"SPOT FOTO","x":-4.5,"z":240.9},{"t":"TITIK KUMPUL","x":-44.1,"z":106.6},{"t":"SPOT FOTO","x":-10.6,"z":74.6},{"t":"TITIK KUMPUL","x":31.4,"z":118.7},{"t":"PARKIR MOBIL","x":-111.4,"z":44.2},{"t":"SPOT FOTO","x":-14.2,"z":2.8},{"t":"SPOT FOTO","x":-15.4,"z":-45.2},{"t":"PARKIR MOBIL","x":-138.1,"z":-26.8},{"t":"SPOT FOTO","x":-19.7,"z":-248.5},{"t":"PARKIR MOBIL","x":-153.0,"z":-52.6},{"t":"SPOT FOTO","x":-20.1,"z":-262.0},{"t":"PARKIR MOBIL","x":-103.4,"z":-72.3},{"t":"SPOT FOTO","x":-20.9,"z":-285.2},{"t":"SPOT FOTO","x":-184.9,"z":-272.1},{"t":"PARKIR MOBIL","x":-82.7,"z":-225.5},{"t":"TITIK KUMPUL","x":-56.2,"z":57.5},{"t":"PARKIR MOBIL","x":-108.2,"z":-210.0},{"t":"TITIK KUMPUL","x":15.8,"z":49.0},{"t":"SPOT FOTO","x":-81.1,"z":-134.5},{"t":"SPOT FOTO","x":-171.2,"z":-85.1},{"t":"TITIK KUMPUL","x":44.4,"z":-58.4},{"t":"PARKIR MOBIL","x":-151.4,"z":-236.3},{"t":"SPOT FOTO","x":-123.5,"z":235.3},{"t":"PARKIR MOBIL","x":-142.4,"z":-218.6},{"t":"TITIK KUMPUL","x":-135.6,"z":-81.0},{"t":"PARKIR MOBIL","x":-93.7,"z":-280.1},{"t":"TITIK KUMPUL","x":-137.7,"z":-7.4},{"t":"PARKIR MOBIL","x":27.7,"z":-189.0},{"t":"PARKIR MOBIL","x":102.9,"z":-229.3},{"t":"PARKIR MOBIL","x":131.5,"z":-230.5},{"t":"PARKIR MOBIL","x":226.9,"z":-252.6},{"t":"PARKIR MOBIL","x":221.4,"z":-241.7},{"t":"PARKIR MOBIL","x":217.3,"z":-178.8},{"t":"PARKIR MOBIL","x":197.6,"z":-150.1},{"t":"PARKIR MOBIL","x":148.2,"z":-126.7},{"t":"AREA MEROKOK","x":164.1,"z":237.9},{"t":"AREA MEROKOK","x":-93.1,"z":253.8},{"t":"AREA MEROKOK","x":-238.1,"z":249.6},{"t":"AREA MEROKOK","x":218.4,"z":-160.3},{"t":"TITIK KUMPUL","x":-262.9,"z":-575.3},{"t":"TITIK KUMPUL","x":-305.2,"z":-418.3},{"t":"AREA MEROKOK","x":166.0,"z":-292.9},{"t":"AREA MEROKOK","x":55.7,"z":-424.1},{"t":"AREA MEROKOK","x":60.7,"z":-513.4},{"t":"TITIK KUMPUL","x":46.8,"z":-548.2},{"t":"AREA MEROKOK","x":-271.5,"z":-546.2},{"t":"AREA MEROKOK","x":-219.4,"z":-391.0},{"t":"PARKIR MOBIL","x":135.6,"z":-5.5},{"t":"FIRE","x":35.3,"z":246.0},{"t":"FIRE","x":-83.5,"z":254.0},{"t":"FIRE","x":-101.6,"z":234.7},{"t":"PARKIR MOBIL","x":67.8,"z":246.9},{"t":"FIRE","x":-177.2,"z":196.6},{"t":"PARKIR MOBIL","x":147.3,"z":310.5},{"t":"TITIK KUMPUL","x":219.4,"z":-253.0},{"t":"FIRE","x":-72.8,"z":184.7},{"t":"TITIK KUMPUL","x":-16.2,"z":-127.9},{"t":"FIRE","x":-31.4,"z":100.7},{"t":"TITIK KUMPUL","x":88.2,"z":-302.7},{"t":"FIRE","x":-70.1,"z":88.5},{"t":"PARKIR MOBIL","x":18.8,"z":229.5},{"t":"FIRE","x":-125.0,"z":130.6},{"t":"FIRE","x":-191.3,"z":120.4},{"t":"PARKIR MOBIL","x":-33.7,"z":248.8},{"t":"FIRE","x":-207.7,"z":195.1},{"t":"PARKIR MOBIL","x":48.5,"z":115.3},{"t":"FIRE","x":-246.6,"z":157.5},{"t":"FIRE","x":-207.7,"z":122.6},{"t":"PARKIR MOBIL","x":30.4,"z":71.0},{"t":"FIRE","x":-243.3,"z":110.2},{"t":"PARKIR MOBIL","x":27.5,"z":49.0},{"t":"FIRE","x":-213.3,"z":74.5},{"t":"FIRE","x":-244.5,"z":75.0},{"t":"PARKIR MOBIL","x":-80.4,"z":45.4},{"t":"AREA MEROKOK","x":-40.2,"z":55.2},{"t":"FIRE","x":-187.6,"z":50.4},{"t":"FIRE","x":-186.9,"z":32.4},{"t":"POS SATPAM","x":-17.7,"z":268.4},{"t":"FIRE","x":-199.0,"z":-24.1},{"t":"FIRE","x":-177.6,"z":-47.4},{"t":"FIRE","x":-242.6,"z":-84.9},{"t":"POS SATPAM","x":5.5,"z":225.1},{"t":"KOPERASI","x":8.0,"z":199.9},{"t":"PARKIR MOBIL","x":35.2,"z":-82.4},{"t":"FIRE","x":-245.2,"z":-109.5},{"t":"FIRE","x":-185.4,"z":-133.4},{"t":"FIRE","x":-174.0,"z":-125.2},{"t":"FIRE","x":-150.2,"z":-87.0},{"t":"FIRE","x":-128.7,"z":-56.0},{"t":"FIRE","x":-83.5,"z":-81.8},{"t":"FIRE","x":-93.1,"z":-122.8},{"t":"FIRE","x":-146.6,"z":-143.9},{"t":"PARKIR MOBIL","x":-53.3,"z":-187.2},{"t":"KOPERASI","x":-124.1,"z":24.0},{"t":"FIRE","x":-82.2,"z":-146.7},{"t":"FIRE","x":40.7,"z":-99.9},{"t":"FIRE","x":59.7,"z":-226.7},{"t":"FIRE","x":1.9,"z":-203.4},{"t":"FIRE","x":91.1,"z":-200.6},{"t":"KOPERASI","x":114.3,"z":-301.2},{"t":"FIRE","x":45.9,"z":-217.0},{"t":"KOPERASI","x":243.4,"z":-187.1},{"t":"FIRE","x":-77.5,"z":-260.3},{"t":"FIRE","x":-94.5,"z":-230.0},{"t":"FIRE","x":-114.8,"z":-235.5},{"t":"FIRE","x":-107.5,"z":-193.2},{"t":"FIRE","x":-189.8,"z":-443.9},{"t":"FIRE","x":-244.2,"z":-256.4},{"t":"POS SATPAM","x":-41.6,"z":-290.7},{"t":"FIRE","x":-239.3,"z":-202.8},{"t":"FIRE","x":139.2,"z":-99.2},{"t":"FIRE","x":129.1,"z":-82.3},{"t":"FIRE","x":-189.6,"z":-523.4},{"t":"FIRE","x":210.9,"z":-77.4},{"t":"FIRE","x":-94.2,"z":-293.2},{"t":"FIRE","x":138.7,"z":-30.6},{"t":"FIRE","x":-203.7,"z":-385.3},{"t":"FIRE","x":-239.3,"z":-185.2},{"t":"FIRE","x":-241.7,"z":-170.8},{"t":"FIRE","x":-226.7,"z":-380.1},{"t":"FIRE","x":46.3,"z":69.3},{"t":"FIRE","x":189.9,"z":27.2},{"t":"FIRE","x":131.7,"z":23.8},{"t":"FIRE","x":-252.9,"z":-422.2},{"t":"FIRE","x":-284.5,"z":-522.0},{"t":"POS SATPAM","x":-4.7,"z":-395.2},{"t":"FIRE","x":24.8,"z":245.5},{"t":"FIRE","x":-213.0,"z":-504.1},{"t":"POS SATPAM","x":-1.5,"z":-562.5},{"t":"FIRE","x":157.2,"z":221.5},{"t":"FIRE","x":-213.3,"z":-464.4},{"t":"FIRE","x":110.0,"z":231.1},{"t":"FIRE","x":195.2,"z":-105.6},{"t":"FIRE","x":-244.6,"z":-552.9},{"t":"POS SATPAM","x":146.9,"z":-329.9},{"t":"POS SATPAM","x":90.4,"z":-316.5},{"t":"FIRE","x":183.2,"z":164.9},{"t":"FIRE","x":178.8,"z":100.1},{"t":"FIRE","x":170.5,"z":62.0},{"t":"PARKIR MOTOR","x":-203.8,"z":338.4},{"t":"FIRE","x":98.0,"z":99.9},{"t":"POS SATPAM","x":207.4,"z":-6.9},{"t":"PARKIR MOTOR","x":176.3,"z":310.1},{"t":"FIRE","x":73.2,"z":132.0},{"t":"POS SATPAM","x":189.2,"z":249.7},{"t":"PARKIR MOTOR","x":-75.9,"z":252.5},{"t":"POS SATPAM","x":-259.2,"z":229.4},{"t":"PARKIR MOTOR","x":-170.6,"z":-212.9},{"t":"PARKIR MOTOR","x":-142.6,"z":-202.1},{"t":"POS SATPAM","x":-125.1,"z":146.4},{"t":"FIRE","x":125.9,"z":-167.6},{"t":"FIRE","x":106.4,"z":17.6},{"t":"FIRE","x":5.0,"z":-18.7},{"t":"PARKIR MOTOR","x":128.9,"z":-248.5},{"t":"FIRE","x":224.5,"z":-211.5},{"t":"MUSHOLLA","x":102.6,"z":146.1},{"t":"POS SATPAM","x":-145.4,"z":-52.7},{"t":"PARKIR MOTOR","x":147.2,"z":-182.7},{"t":"FIRE","x":137.6,"z":-248.1},{"t":"PARKIR MOTOR","x":140.9,"z":-126.5},{"t":"MUSHOLLA","x":183.1,"z":-22.0},{"t":"FIRE","x":111.8,"z":-268.2},{"t":"FIRE","x":-1.5,"z":20.7},{"t":"FIRE","x":22.5,"z":32.8},{"t":"MUSHOLLA","x":147.7,"z":154.7},{"t":"FIRE","x":108.6,"z":-288.9},{"t":"FIRE","x":-48.8,"z":73.9},{"t":"FIRE","x":-22.7,"z":17.1},{"t":"MUSHOLLA","x":150.5,"z":133.2},{"t":"POS SATPAM","x":-266.2,"z":-189.1},{"t":"PARKIR MOTOR","x":206.2,"z":-150.3},{"t":"FIRE","x":-74.1,"z":16.0},{"t":"MUSHOLLA","x":137.0,"z":-120.9},{"t":"FIRE","x":-132.9,"z":26.1},{"t":"FIRE","x":206.3,"z":-124.8},{"t":"FIRE","x":-76.4,"z":-8.6},{"t":"FIRE","x":-27.7,"z":-36.1},{"t":"MUSHOLLA","x":174.2,"z":-172.8},{"t":"FIRE","x":-88.6,"z":-28.8},{"t":"MUSHOLLA","x":147.3,"z":-216.2},{"t":"FIRE","x":-137.6,"z":-18.0},{"t":"PARKIR MOTOR","x":-250.1,"z":-544.6},{"t":"MUSHOLLA","x":130.2,"z":-266.9},{"t":"KANTIN","x":-129.9,"z":17.9},{"t":"TITIK KUMPUL","x":134.5,"z":-14.0},{"t":"PARKIR MOTOR","x":-262.5,"z":-564.4},{"t":"MUSHOLLA","x":12.6,"z":-230.9},{"t":"MUSHOLLA","x":-71.6,"z":-214.8},{"t":"MUSHOLLA","x":-95.1,"z":-222.1},{"t":"MUSHOLLA","x":-104.2,"z":-262.0},{"t":"PARKIR MOTOR","x":69.7,"z":-463.8},{"t":"MUSHOLLA","x":-179.0,"z":-245.0},{"t":"MUSHOLLA","x":-178.4,"z":-180.9},{"t":"MUSHOLLA","x":-186.2,"z":-58.2},{"t":"POS SATPAM","x":102.0,"z":-180.4},{"t":"MUSHOLLA","x":-188.2,"z":-14.0},{"t":"KANTIN","x":-197.8,"z":-8.3},{"t":"KANTIN","x":-180.7,"z":-6.6},{"t":"MUSHOLLA","x":-241.1,"z":125.3},{"t":"MUSHOLLA","x":-213.7,"z":134.1},{"t":"PARKIR MOTOR","x":125.5,"z":-321.3},{"t":"KANTIN","x":-161.2,"z":12.3},{"t":"KANTIN","x":110.6,"z":145.5},{"t":"POS SATPAM","x":-191.6,"z":-360.6},{"t":"KANTIN","x":-110.2,"z":-139.2},{"t":"MUSHOLLA","x":-124.5,"z":114.0},{"t":"MUSHOLLA","x":-144.5,"z":162.3},{"t":"KANTIN","x":185.7,"z":-8.3},{"t":"KANTIN","x":143.1,"z":-13.3},{"t":"MUSHOLLA","x":-75.1,"z":99.7},{"t":"PARKIR MOTOR","x":-247.9,"z":95.1},{"t":"MUSHOLLA","x":6.8,"z":93.4},{"t":"PARKIR MOTOR","x":-104.2,"z":65.4},{"t":"MUSHOLLA","x":59.4,"z":0.6},{"t":"KANTIN","x":-213.8,"z":-259.2},{"t":"MUSHOLLA","x":73.7,"z":-32.3},{"t":"PARKIR MOTOR","x":-51.6,"z":46.0},{"t":"MUSHOLLA","x":-63.2,"z":-27.5},{"t":"KANTIN","x":-39.1,"z":-364.7},{"t":"MUSHOLLA","x":-103.6,"z":1.7},{"t":"PARKIR MOTOR","x":-98.1,"z":-180.9},{"t":"MUSHOLLA","x":-49.3,"z":-83.9},{"t":"MUSHOLLA","x":31.6,"z":-112.2},{"t":"MUSHOLLA","x":38.2,"z":-153.8},{"t":"KANTIN","x":26.4,"z":-437.0},{"t":"MUSHOLLA","x":-46.3,"z":-137.7},{"t":"MUSHOLLA","x":60.4,"z":-136.1},{"t":"MUSHOLLA","x":60.9,"z":-102.0},{"t":"PARKIR MOTOR","x":101.8,"z":-79.4},{"t":"MUSHOLLA","x":-208.3,"z":-552.0},{"t":"MUSHOLLA","x":36.2,"z":-437.6},{"t":"PARKIR MOTOR","x":-230.6,"z":-181.0},{"t":"KOPERASI","x":-34.4,"z":-371.2},{"t":"PARKIR MOTOR","x":-53.6,"z":-74.0},{"t":"KANTIN","x":243.1,"z":-179.7},{"t":"PARKIR MOTOR","x":39.6,"z":69.9},{"t":"TITIK KUMPUL","x":233.1,"z":-140.0},{"t":"KANTIN","x":49.6,"z":78.7},{"t":"PARKIR MOTOR","x":-191.0,"z":66.2},{"t":"AREA MEROKOK","x":-238.1,"z":-37.5},{"t":"PARKIR MOTOR","x":59.0,"z":248.1},{"t":"PARKIR MOBIL","x":186.8,"z":187.5},{"t":"PARKIR MOBIL","x":208.4,"z":130.1},{"t":"TITIK KUMPUL","x":209.1,"z":137.1},{"t":"PARKIR MOBIL","x":129.7,"z":-92.5},{"t":"FIRE","x":190.8,"z":46.5},{"t":"FIRE","x":215.1,"z":13.0},{"t":"PARKIR MOBIL","x":226.7,"z":34.2},{"t":"PARKIR MOBIL","x":226.0,"z":-9.2},{"t":"TITIK KUMPUL","x":224.1,"z":-42.6},{"t":"PARKIR MOTOR","x":244.0,"z":-250.0},{"t":"FIRE","x":188.6,"z":-253.2},{"t":"FIRE","x":195.5,"z":-253.0},{"t":"PARKIR MOBIL","x":169.6,"z":-269.4},{"t":"PARKIR MOTOR","x":150.5,"z":-299.0},{"t":"FIRE","x":138.7,"z":-258.2},{"t":"FIRE","x":103.7,"z":-241.4},{"t":"PARKIR MOBIL","x":121.2,"z":-249.6},{"t":"PARKIR MOBIL","x":181.6,"z":-253.4},{"t":"KANTIN","x":29.5,"z":-261.9},{"t":"FIRE","x":11.1,"z":-278.0},{"t":"PARKIR MOTOR","x":-51.5,"z":-291.8},{"t":"FIRE","x":-38.0,"z":-261.1},{"t":"FIRE","x":-63.7,"z":-290.2},{"t":"PARKIR MOTOR","x":-102.8,"z":-291.7},{"t":"FIRE","x":-118.8,"z":-211.3},{"t":"FIRE","x":-121.0,"z":-266.2},{"t":"POS SATPAM","x":-190.5,"z":-297.0},{"t":"PARKIR MOBIL","x":-215.0,"z":-288.1},{"t":"AREA MEROKOK","x":-223.1,"z":-298.7},{"t":"PARKIR MOTOR","x":-211.5,"z":-297.3},{"t":"PARKIR MOBIL","x":-258.4,"z":-216.8},{"t":"FIRE","x":-210.7,"z":-233.6},{"t":"PARKIR MOTOR","x":-224.1,"z":-234.5},{"t":"PARKIR MOBIL","x":-244.7,"z":-215.5},{"t":"FIRE","x":-236.6,"z":75.6},{"t":"FIRE","x":-247.0,"z":-50.0},{"t":"POS SATPAM","x":-223.0,"z":253.2},{"t":"PARKIR MOBIL","x":-220.8,"z":178.0},{"t":"PARKIR MOBIL","x":-33.3,"z":231.0},{"t":"PARKIR MOBIL","x":-49.5,"z":182.3},{"t":"FIRE","x":-62.2,"z":120.9},{"t":"PARKIR MOTOR","x":-76.1,"z":68.6},{"t":"PARKIR MOBIL","x":-132.1,"z":65.6},{"t":"FIRE","x":-112.0,"z":-7.3},{"t":"FIRE","x":-75.4,"z":-56.5},{"t":"FIRE","x":-42.4,"z":-57.5},{"t":"FIRE","x":-33.3,"z":-130.3},{"t":"SPOT FOTO","x":-16.5,"z":-180.8},{"t":"PARKIR MOTOR","x":14.3,"z":-209.8},{"t":"PARKIR MOBIL","x":34.8,"z":-209.7},{"t":"MUSHOLLA","x":79.3,"z":-262.1},{"t":"FIRE","x":66.2,"z":-274.4},{"t":"PARKIR MOTOR","x":91.1,"z":-274.1},{"t":"PARKIR MOTOR","x":41.9,"z":-293.6},{"t":"KOPERASI","x":151.0,"z":-13.3},{"t":"PARKIR MOTOR","x":145.1,"z":11.8},{"t":"PARKIR MOBIL","x":99.6,"z":42.3},{"t":"TITIK KUMPUL","x":107.9,"z":43.6},{"t":"PARKIR MOTOR","x":36.8,"z":41.2},{"t":"KANTIN","x":-36.7,"z":79.4},{"t":"PARKIR MOBIL","x":70.2,"z":114.0},{"t":"PARKIR MOTOR","x":78.0,"z":160.0},{"t":"PARKIR MOTOR","x":98.4,"z":134.3},{"t":"PARKIR MOBIL","x":147.3,"z":45.2},{"t":"PARKIR MOBIL","x":150.4,"z":63.3},{"t":"PARKIR MOBIL","x":185.9,"z":36.6},{"t":"PARKIR MOBIL","x":189.3,"z":16.3},{"t":"PARKIR MOBIL","x":164.5,"z":-116.4},{"t":"FIRE","x":216.4,"z":-144.7},{"t":"PARKIR MOBIL","x":162.2,"z":-141.1},{"t":"PARKIR MOBIL","x":138.6,"z":-182.3},{"t":"FIRE","x":-80.2,"z":-212.3},{"t":"FIRE","x":-79.6,"z":-233.2},{"t":"FIRE","x":-39.4,"z":-200.4},{"t":"FIRE","x":-73.1,"z":-201.7},{"t":"PARKIR MOTOR","x":-57.2,"z":-202.6},{"t":"FIRE","x":-158.5,"z":-199.8},{"t":"KOPERASI","x":-104.1,"z":-139.0},{"t":"PARKIR MOTOR","x":-147.2,"z":-43.5},{"t":"PARKIR MOTOR","x":-189.4,"z":191.8},{"t":"FIRE","x":38.8,"z":97.2},{"t":"FIRE","x":-35.8,"z":32.8},{"t":"FIRE","x":90.4,"z":33.5},{"t":"FIRE","x":48.5,"z":-8.7},{"t":"FIRE","x":73.2,"z":-57.2},{"t":"PARKIR MOTOR","x":17.5,"z":-74.7},{"t":"AREA MEROKOK","x":79.9,"z":247.5},{"t":"PARKIR MOBIL","x":149.7,"z":100.0}],"gates":[{"name":"Gerbang Utama","hours":"24 jam","fn":"Semua","acc":"Umum","live":1,"x":-8,"z":296},{"name":"Gerbang Parkiran Sipil","hours":"06.00–23.00","fn":"Motor","acc":"Umum","live":1,"x":-191,"z":349},{"name":"Gerbang Batan (Gerbang BRIN)","hours":"06.00–23.00","fn":"Pejalan kaki","acc":"Umum","live":1,"x":null,"z":null},{"name":"Gerbang CADL","hours":"06.00–18.00","fn":"Semua","acc":"Umum","live":1,"x":-130,"z":-303},{"name":"Gerbang CAS","hours":"06.00–18.00","fn":"Semua","acc":"Umum","live":1,"x":109,"z":-318},{"name":"Gerbang Parkiran Seni Rupa","hours":"06.00–23.00","fn":"Mobil dan motor","acc":"Umum","live":1,"x":151,"z":334},{"name":"Gerbang Seni Rupa","hours":"06.00–23.00","fn":"Pejalan kaki","acc":"Umum","live":1,"x":null,"z":null},{"name":"Gerbang Utara","hours":"06.00–23.00","fn":"Pejalan kaki","acc":"Umum","live":1,"x":-13,"z":-300},{"name":"Gerbang SBM","hours":"–","fn":"–","acc":"Khusus","live":0,"x":-183,"z":-303},{"name":"Gerbang Wisma Ganesha","hours":"–","fn":"Mobil dan motor","acc":"Khusus","live":0,"x":null,"z":null},{"name":"Gerbang Dayang Sumbi","hours":"–","fn":"Mobil dan motor","acc":"Khusus","live":0,"x":161,"z":-345},{"name":"Gerbang Barat","hours":"–","fn":"–","acc":"Khusus","live":0,"x":-265,"z":-181},{"name":"Gerbang Lapangan Sipil","hours":"06.00–18.00","fn":"Motor","acc":"Umum","live":1,"x":null,"z":null},{"name":"Gerbang Saraga (utara) — nama belum dipastikan","hours":"?","fn":"?","acc":"?","live":1,"x":-9,"z":-562},{"name":"Gerbang barat daya (ditutup) — nama belum dipastikan","hours":"?","fn":"?","acc":"?","live":0,"x":-255,"z":243}],"hmps":[{"s":"MTM ITB","n":"Himpunan Mahasiswa Teknik Material ITB (MTM ITB)","loc":"Sebelah Barat Selasar Labtek Biru","x":-142.3,"z":-139.3},{"s":"HMO \"TRITON\" ITB","n":"Himpunan Mahasiswa Oseanografi “TRITON” ITB (HMO “TRITON” ITB)","loc":"Jalan E, Sebelah Barat Selasar Labtek Biru","x":-140.9,"z":-129.6},{"s":"HMME \"Atmosphaira\" ITB","n":"Himpunan Mahasiswa Meteorologi “Atmosphaira” ITB (HMME “Atmosphaira” ITB)","loc":"Sebelah Tenggara Selasar Labtek Biru","x":-111.8,"z":-131.6},{"s":"HIMATEK-ITB","n":"Himpunan Mahasiswa Teknik Kimia ITB (HIMATEK-ITB)","loc":"Sebelah Barat Laut Selasar Labtek Biru","x":-132.9,"z":-139.7},{"s":"HMP Pangripta Loka ITB","n":"Himpunan Mahasiswa Perencanaan Wilayah dan Kota Pangripta Loka ITB (HMP Pangripta Loka ITB)","loc":"Sebelah Utara Labtek IXA Lt.1","x":119.3,"z":106.1},{"s":"IPPDIG ITB","n":"Ikatan Pemuda Pemudi Desain Grafis ITB (IPPDIG ITB)","loc":"Jalan V, Gedung CADL lantai 6","x":-99.2,"z":-214.7},{"s":"INDDES-ITB","n":"Industrial Design Student Society ITB (INDDES-ITB)","loc":"Jalan V, Gedung CADL lantai 7","x":-118.3,"z":-214.5},{"s":"TERIKAT ITB","n":"Himpunan Mahasiswa Kriya Tekstil dan Keramik ITB (TERIKAT ITB)","loc":"Jalan V, Gedung CADL lantai 7","x":-108.3,"z":-215.2},{"s":"KMM ITB","n":"Keluarga Mahasiswa Manajemen ITB (KMM ITB)","loc":"Jalan D, Gedung Freeport (Labtek XIV)","x":-214.9,"z":-248.9},{"s":"KMPN","n":"Keluarga Mahasiswa Teknik Penerbangan (KMPN)","loc":"Jalan D, Sebelah Barat Labtek II","x":-236.5,"z":-66.9},{"s":"HMM ITB","n":"Himpunan Mahasiswa Mesin ITB (HMM ITB)","loc":"Jalan D, sebelah Barat Labtek II","x":-235.8,"z":-52.1},{"s":"HMFT-ITB","n":"Himpunan Mahasiswa Fisika Teknik ITB (HMFT-ITB)","loc":"Sebelah Tenggara Lembah TVST","x":-36.0,"z":-95.0},{"s":"IMA-G ITB","n":"Ikatan Mahasiswa Arsitektur Gunadharma ITB (IMA-G ITB)","loc":"Sebelah Utara Labtek IXB, sebelah Tenggara Mushola Bundar.","x":148.0,"z":141.8},{"s":"HIMAMIKRO \"Archaea\"ITB","n":"Himpunan Mahasiswa Mikrobiologi “Archaea” ITB (HIMAMIKRO “Archaea”ITB)","loc":"Sebelah Barat Daya Lembah TVST","x":-53.8,"z":-91.9},{"s":"KMKL-ITB","n":"Keluarga Mahasiswa Teknik Kelautan ITB (KMKL-ITB)","loc":"Jalan C, Gedung Manajemen Rekayasa Konstruksi - KL Heritage","x":-171.4,"z":187.0},{"s":"HMIF ITB","n":"Himpunan Mahasiswa Informatika ITB (HMIF ITB)","loc":"Labtek V Gedung Benny Subianto, Lantai 1 dan Lantai 4","x":-99.8,"z":15.3},{"s":"HIMA TG \"TERRA\" ITB","n":"Himpunan Mahasiswa Teknik Geofisika “TERRA” ITB (HIMA TG “TERRA” ITB)","loc":"Gedung BSC-B Lantai 2","x":148.9,"z":-163.9},{"s":"VASA ITB","n":"Visual Art Student Aggregate ITB (VASA ITB)","loc":"Jalan I, Gedung CAD Lama","x":118.9,"z":204.4},{"s":"HMS ITB","n":"Himpunan Mahasiswa Sipil ITB (HMS ITB)","loc":"Jalan C, sebelah Barat Gedung Teknik Sipil","x":-189.0,"z":162.5},{"s":"HIMAFI ITB","n":"Himpunan Mahasiswa Fisika ITB (HIMAFI ITB)","loc":"Jalan B, Sebelah Timur Gedung Fisika","x":-97.1,"z":94.5},{"s":"HMTL ITB","n":"Himpunan Mahasiswa Teknik Lingkungan ITB (HMTL ITB)","loc":"Jalan VI, sebelah Selatan Gedung Teknik Lingkungan","x":145.0,"z":86.9},{"s":"HMK ‘AMISCA’ ITB","n":"Himpunan Mahasiswa Kimia ‘AMISCA’ ITB (HMK ‘AMISCA’ ITB)","loc":"Sebelah Barat Gedung Kimia Baru, Lantai 1","x":141.7,"z":-102.2},{"s":"HMT-ITB","n":"Himpunan Mahasiswa Tambang ITB (HMT-ITB)","loc":"Sebelah Utara Labtek IV","x":159.0,"z":-238.5},{"s":"IMG-ITB","n":"Ikatan Mahasiswa Geodesi ITB (IMG-ITB)","loc":"Persimpangan Jalan 6 dan Jalan J","x":198.0,"z":92.8},{"s":"HMTM \"PATRA\" ITB","n":"Himpunan Mahasiswa Teknik Perminyakan “PATRA” ITB (HMTM “PATRA” ITB)","loc":"Gedung Teknik Perminyakan Lantai Dasar","x":207.2,"z":-167.5},{"s":"HMTG \"GEA\" ITB","n":"Himpunan Mahasiswa Teknik Geologi “GEA” ITB (HMTG “GEA” ITB)","loc":"Sebelah Selatan Labtek IV Lantai 1, Gedung Teknik Geologi","x":177.3,"z":-222.6},{"s":"IMMG ITB","n":"Ikatan Mahasiswa Metalurgi ITB (IMMG ITB)","loc":"Sebelah Selatan Labtek IV","x":123.8,"z":-228.1},{"s":"HIMATIKA ITB","n":"Himpunan Mahasiswa Matematika dan Aktuaria ITB (HIMATIKA ITB)","loc":"Sebelah Utara Labtek I (Mektan) Lantai 1","x":68.4,"z":-177.0},{"s":"HIMABIO \"Nymphaea\" ITB","n":"Himpunan Mahasiswa Biologi “Nymphaea” ITB (HIMABIO “Nymphaea” ITB)","loc":"Sebelah Barat Daya Selasar Labtek Biru","x":-131.4,"z":-131.1},{"s":"HIMASTRON ITB","n":"Himpunan Mahasiswa Astronomi ITB (HIMASTRON ITB)","loc":"Sebelah Utara Labtek I (Mektan) Lantai 1","x":81.1,"z":-178.4},{"s":"IMDI ITB","n":"Ikatan Mahasiswa Desain Interior ITB (IMDI ITB)","loc":"Jalan V, Gedung CADL lantai 7","x":-109.6,"z":-225.2},{"s":"MTI ITB","n":"Keluarga Mahasiswa Teknik Industri ITB (MTI ITB)","loc":"Jalan E, Labtek III Matthias Aroef lantai 2","x":-191.2,"z":-191.5},{"s":"IMK \"Artha\" ITB","n":"Ikatan Mahasiswa Kewirausahaan ”Artha” ITB (IMK “Artha” ITB)","loc":"Jalan D, Gedung Freeport (Labtek XIV) Lantai 1","x":-202.0,"z":-249.1},{"s":"HMF 'Ars Praeparandi' ITB","n":"Himpunan Mahasiswa Farmasi 'Ars Praeparandi' ITB (HMF 'Ars Praeparandi' ITB)","loc":"Basement Labtek VII (Gedung Yusuf Panigoro)","x":23.2,"z":-25.0},{"s":"HME ITB","n":"Himpunan Mahasiswa Elektroteknik ITB (HME ITB)","loc":"Basement antara Labtek VII dan VIII","x":59.1,"z":-14.2},{"s":"IMT \"Signum\" ITB","n":"Ikatan Mahasiswa Telekomunikasi “Signum” ITB (IMT “Signum” ITB)","loc":"Jalan D, Sebelah Barat Lab. Telekomunikasi Radio dan Gelombang Mikro","x":-245.3,"z":2.6}]};   /* rujukan dari peta AMI 2026 & Capantour: titik bernomor, label utara, simbol fasilitas, gerbang, himpunan */
+
+var CFG = {
+  floorH: 3.8,
+  defaultLevels: 2,
+  elev: { x0: -320, z0: -600, step: 20, smooth: 2, datum: [-14, 46], dataNorth: -480 },   /* utara z < -480: belum ada data DEM, elevasi disalin dari tepi */
+  tex: { x0: -330, x1: 370, z0: -600, z1: 500, res: 0.5 },
+  slopeClass: [ [5, '#3f9b4b'], [8.33, '#c7d84a'], [12, '#f2a93b'], [20, '#e0552d'], [999, '#9c1f2e'] ],
+  roadW: { secondary: 12, tertiary: 9, unclassified: 6, residential: 6, service: 5.5, pedestrian: 6, footway: 3, corridor: 3, steps: 3 },
+  mainRoads: ['Jl. Ganesa', 'Jalan Tamansari', 'Jalan Dayang Sumbi', 'Boulevard ITB', 'Jalan A', 'Jalan 1', 'Jalan 2', 'Jalan G', 'Jalan 5', 'Jalan 10', 'Koridor Labtek V'],
+  fac: {
+    'TITIK KUMPUL': ['Titik kumpul', '#1f9d55', 'TK', 1], 'TOILET 24 JAM': ['Toilet 24 jam', '#1565c0', 'WC', 1], 'TOILET NON 24': ['Toilet (bukan 24 jam)', '#64a0d8', 'wc', 0],
+    'MUSHOLLA': ['Musholla', '#0f766e', 'M', 1], 'POS SATPAM': ['Pos satpam', '#283593', 'S', 1], 'APOTEK': ['Apotek', '#2e7d32', '+', 1], 'FIRE': ['Hydrant', '#d32f2f', 'H', 0],
+    'PARKIR MOBIL': ['Parkir mobil', '#1e4fa3', 'P', 0], 'PARKIR MOTOR': ['Parkir motor', '#3b6fd6', 'Pm', 0], 'KANTIN': ['Kantin', '#e07b00', 'K', 0], 'KOPERASI': ['Koperasi', '#6d4c41', 'Ko', 0],
+    'SPOT FOTO': ['Spot foto', '#333333', 'F', 0], 'AREA MEROKOK': ['Area merokok', '#b8860b', 'R', 0]
+  },
+  labtek5: { x0: -130, x1: -28, z0: -4, z1: 24, levels: 4, arcade: 2.6, colStep: 5.1, color: 0xe07b39 },
+  gableRoof: ['Labtek V', 'Labtek VI', 'Labtek VIII', 'School of Pharmacy ITB'],
+  types: [
+    { id: 'tenda3',  name: 'Tenda 3 × 3 m',      w: 3, d: 3, h: 2.6, color: '#1d4fc4' },
+    { id: 'tenda36', name: 'Tenda 6 × 3 m',      w: 6, d: 3, h: 2.6, color: '#5fd0e6' },
+    { id: 'booth2',  name: 'Booth partisi 2 × 2 m', w: 2, d: 2, h: 2.4, color: '#8e44ad' },
+    { id: 'stage',   name: 'Panggung 8 × 5 m',   w: 8, d: 5, h: 0.8, color: '#c0392b', stage: true },
+    { id: 'info',    name: 'Meja informasi',     w: 2, d: 1, h: 0.75, color: '#27ae60', table: true },
+    { id: 'banner',  name: 'Banner / gapura 4 m', w: 4, d: 0.4, h: 3.5, color: '#f0a030', banner: true }
+  ]
+};
+
+(function () {
+  var stage = document.getElementById('stage');
+  function fail() { document.getElementById('err').style.display = 'flex'; }
+  if (typeof THREE === 'undefined') { fail(); return; }
+  var renderer;
+  try { renderer = new THREE.WebGLRenderer({ antialias: true }); } catch (e) { fail(); return; }
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  stage.insertBefore(renderer.domElement, stage.firstChild);
+
+  var scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xdfe6ea);
+  scene.fog = new THREE.Fog(0xdfe6ea, 700, 1400);
+  var camera = new THREE.PerspectiveCamera(50, 1, 0.3, 3000);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x7d8a8f, 0.72));
+  var sun = new THREE.DirectionalLight(0xffffff, 0.42);
+  sun.position.set(-120, 220, 80); scene.add(sun);
+
+  var G = { labels: new THREE.Group(), trees: new THREE.Group(), roofs: new THREE.Group(), others: new THREE.Group(),
+            main: new THREE.Group(), booths: new THREE.Group(), measure: new THREE.Group(), l5: new THREE.Group(),
+            steps: new THREE.Group(), prof: new THREE.Group() };
+  for (var k in G) scene.add(G[k]);
+
+  /* ---------- helper ---------- */
+  var matCache = {};
+  function mat(color, opts) {
+    var key = color + JSON.stringify(opts || {});
+    if (!matCache[key]) { var o = { color: color }; if (opts) for (var p in opts) o[p] = opts[p]; matCache[key] = new THREE.MeshLambertMaterial(o); }
+    return matCache[key];
+  }
+  function boxB(x0, x1, y0, y1, z0, z1, material, parent) {
+    var m = new THREE.Mesh(new THREE.BoxGeometry(Math.abs(x1 - x0), Math.abs(y1 - y0), Math.abs(z1 - z0)), material);
+    m.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2);
+    (parent || scene).add(m); return m;
+  }
+  function quad(a, b, c, d, material, parent) {
+    var g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute([].concat(a, b, c, a, c, d), 3));
+    g.computeVertexNormals();
+    var m = new THREE.Mesh(g, material); (parent || scene).add(m); return m;
+  }
+  function tri(a, b, c, material, parent) {
+    var g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute([].concat(a, b, c), 3));
+    g.computeVertexNormals();
+    var m = new THREE.Mesh(g, material); (parent || scene).add(m); return m;
+  }
+  function canvasTex(w, h, draw) {
+    var c = document.createElement('canvas'); c.width = w; c.height = h;
+    draw(c.getContext('2d'), w, h);
+    var t = new THREE.CanvasTexture(c); t.anisotropy = 4; return t;
+  }
+  var labels = [], labelsOn = true;
+  function label(text, x, y, z, size, maxD, bg) {
+    var fs = 40, pad = 14;
+    var c = document.createElement('canvas'); var g = c.getContext('2d');
+    g.font = '600 ' + fs + 'px system-ui,sans-serif';
+    var w = Math.ceil(g.measureText(text).width) + pad * 2, h = fs + pad * 1.4;
+    c.width = w; c.height = h;
+    g.font = '600 ' + fs + 'px system-ui,sans-serif';
+    g.fillStyle = bg || 'rgba(255,255,255,0.93)'; g.fillRect(0, 0, w, h);
+    g.strokeStyle = 'rgba(27,34,38,0.55)'; g.lineWidth = 3; g.strokeRect(1.5, 1.5, w - 3, h - 3);
+    g.fillStyle = '#1b2226'; g.textBaseline = 'middle'; g.fillText(text, pad, h / 2 + 1);
+    var s = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), depthTest: false }));
+    var sh = size || 3; s.scale.set(sh * w / h, sh, 1); s.position.set(x, y, z); s.renderOrder = 20;
+    s.userData.maxD = maxD || 1e9;
+    G.labels.add(s); labels.push(s); return s;
+  }
+  function fmt(v, d) { var p = Math.pow(10, d == null ? 1 : d); return (Math.round(v * p) / p).toString().replace('.', ','); }
+  function pct(v) { return fmt(v, 1) + '%'; }
+  function slopeCls(p) { p = Math.abs(p); return p < 8.33 ? 'ok' : p < 12 ? 'mid' : 'bad'; }
+
+  /* ---------- ELEVASI ---------- */
+  var E = CFG.elev, eRows = ELEV.trim().split('\n').map(function (r) { return r.split(',').map(function (v) { return +v / 10; }); });
+  var NZ = eRows.length, NX = eRows[0].length;
+  for (var pass = 0; pass < E.smooth; pass++) {               // haluskan derau kanopi/gedung pada DEM
+    var nr = [];
+    for (var iz = 0; iz < NZ; iz++) {
+      nr.push([]);
+      for (var ix = 0; ix < NX; ix++) {
+        var s = 0, w = 0;
+        for (var dz = -1; dz <= 1; dz++) for (var dx = -1; dx <= 1; dx++) {
+          var zz = Math.min(NZ - 1, Math.max(0, iz + dz)), xx = Math.min(NX - 1, Math.max(0, ix + dx)), ww = (dx ? 1 : 2) * (dz ? 1 : 2);
+          s += eRows[zz][xx] * ww; w += ww;
+        }
+        nr[iz].push(s / w);
+      }
+    }
+    eRows = nr;
+  }
+  function elevAbs(x, z) {
+    var fx = Math.min(NX - 1.0001, Math.max(0, (x - E.x0) / E.step)), fz = Math.min(NZ - 1.0001, Math.max(0, (z - E.z0) / E.step));
+    var ix = Math.floor(fx), iz = Math.floor(fz), tx = fx - ix, tz = fz - iz;
+    return eRows[iz][ix] * (1 - tx) * (1 - tz) + eRows[iz][ix + 1] * tx * (1 - tz) + eRows[iz + 1][ix] * (1 - tx) * tz + eRows[iz + 1][ix + 1] * tx * tz;
+  }
+  var H0 = elevAbs(E.datum[0], E.datum[1]);
+  function hy(x, z) { return elevAbs(x, z) - H0; }
+  function slopeAt(x, z) {                                      // gradien tanah (%) dan arah turun
+    var d = 10, gx = (elevAbs(x + d, z) - elevAbs(x - d, z)) / (2 * d), gz = (elevAbs(x, z + d) - elevAbs(x, z - d)) / (2 * d);
+    return { p: Math.hypot(gx, gz) * 100, gx: gx, gz: gz };
+  }
+  function dirName(gx, gz) {                                     // arah menurun (kompas)
+    var b = (Math.atan2(-gx, gz) * 180 / Math.PI + 360) % 360;
+    return ['utara', 'timur laut', 'timur', 'tenggara', 'selatan', 'barat daya', 'barat', 'barat laut'][Math.round(b / 45) % 8];
+  }
+
+  /* ---------- parse data ---------- */
+  var items = RAW.split('\n').filter(Boolean).map(function (ln) {
+    var p = ln.split('|');
+    var pts = p[2].trim().split(/\s+/).map(function (s) { var a = s.split(','); return [+a[0], +a[1]]; });
+    return { kind: p[0], name: p[1], pts: pts, label: (p[3] || '').trim() };
+  });
+  function disp(it) { return it.label || it.name; }
+  function centroid(pts) { var x = 0, z = 0; pts.forEach(function (p) { x += p[0]; z += p[1]; }); return [x / pts.length, z / pts.length]; }
+  function inPoly(x, z, pts) {
+    var c = false;
+    for (var i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+      var xi = pts[i][0], zi = pts[i][1], xj = pts[j][0], zj = pts[j][1];
+      if (((zi > z) !== (zj > z)) && (x < (xj - xi) * (z - zi) / (zj - zi) + xi)) c = !c;
+    }
+    return c;
+  }
+  function shapeOf(pts) {
+    var s = new THREE.Shape();
+    pts.forEach(function (p, i) { if (i) s.lineTo(p[0], -p[1]); else s.moveTo(p[0], -p[1]); });
+    return s;
+  }
+  function densify(pts, step) {
+    var out = [];
+    for (var i = 0; i < pts.length - 1; i++) {
+      var a = pts[i], b = pts[i + 1], L = Math.hypot(b[0] - a[0], b[1] - a[1]), n = Math.max(1, Math.ceil(L / step));
+      for (var j = 0; j < n; j++) out.push([a[0] + (b[0] - a[0]) * j / n, a[1] + (b[1] - a[1]) * j / n]);
+    }
+    out.push(pts[pts.length - 1]); return out;
+  }
+
+  /* ---------- tekstur peta tanah (area, jalan, kontur) ---------- */
+  var T = CFG.tex, TW = Math.round((T.x1 - T.x0) / T.res), TH = Math.round((T.z1 - T.z0) / T.res);
+  function PX(x) { return (x - T.x0) / T.res; } function PZ(z) { return (z - T.z0) / T.res; }
+  var areaCol = { Lpark: '#9cc27e', Lgarden: '#8fbf6f', Ugrass: '#a7c98a', Ugreenfield: '#a7c98a', Lpitch: '#c98f5a', Lcommon: '#b7c99a',
+                  Uallotments: '#93b878', Nwater: '#6fa8c9', Afountain: '#6fa8c9', Aparking: '#b3b4b0', Afood_court: '#c8b7a0' };
+  var areaOrder = ['Lpark', 'Uallotments', 'Ugrass', 'Ugreenfield', 'Lgarden', 'Lcommon', 'Lpitch', 'Aparking', 'Afood_court', 'Nwater', 'Afountain'];
+  var roadCol = { secondary: '#4d5459', tertiary: '#50575c', unclassified: '#5d6469', residential: '#5d6469', service: '#5d6469',
+                  pedestrian: '#c9b99a', footway: '#c9b99a', corridor: '#b89e7e', steps: '#d62f2f' };
+  var roadOrder = ['corridor', 'footway', 'pedestrian', 'service', 'residential', 'unclassified', 'tertiary', 'secondary', 'steps'];
+  function poly(g, pts) { g.beginPath(); pts.forEach(function (p, i) { if (i) g.lineTo(PX(p[0]), PZ(p[1])); else g.moveTo(PX(p[0]), PZ(p[1])); }); }
+  function roadW(it) { var t = it.kind.slice(1); return it.name === 'Boulevard ITB' ? 7 : it.name === 'Koridor Labtek V' ? CFG.labtek5.arcade : (CFG.roadW[t] || 4); }
+  function paintBase(g, slopeMode) {
+    if (slopeMode) {
+      var img = g.createImageData(TW, TH), d = img.data, step = 4;
+      var cols = CFG.slopeClass.map(function (c) { var h = c[1]; return [parseInt(h.substr(1, 2), 16), parseInt(h.substr(3, 2), 16), parseInt(h.substr(5, 2), 16)]; });
+      for (var py = 0; py < TH; py += step) for (var px = 0; px < TW; px += step) {
+        var zz0 = T.z0 + py * T.res, sp = slopeAt(T.x0 + px * T.res, zz0).p, ci = 0;
+        while (sp >= CFG.slopeClass[ci][0]) ci++;
+        var c = zz0 < CFG.elev.dataNorth ? [190, 190, 186] : cols[ci];
+        for (var yy = py; yy < Math.min(TH, py + step); yy++) for (var xx = px; xx < Math.min(TW, px + step); xx++) {
+          var i = (yy * TW + xx) * 4; d[i] = c[0]; d[i + 1] = c[1]; d[i + 2] = c[2]; d[i + 3] = 255;
+        }
+      }
+      g.putImageData(img, 0, 0);
+      g.globalAlpha = 0.35;
+    } else { g.fillStyle = '#cfccbd'; g.fillRect(0, 0, TW, TH); }
+    areaOrder.forEach(function (k) {
+      items.forEach(function (it) { if (it.kind === k && it.pts.length > 2) { g.fillStyle = areaCol[k]; poly(g, it.pts); g.closePath(); g.fill(); } });
+    });
+    g.globalAlpha = slopeMode ? 0.55 : 1;
+    g.lineCap = 'round'; g.lineJoin = 'round';
+    roadOrder.forEach(function (t) {
+      items.forEach(function (it) {
+        if (it.kind !== 'H' + t) return;
+        g.strokeStyle = roadCol[t]; g.lineWidth = roadW(it) / T.res; poly(g, it.pts); g.stroke();
+        if (t === 'secondary' || t === 'tertiary') { g.strokeStyle = '#f4f4ee'; g.lineWidth = 0.18 / T.res; g.setLineDash([6, 6]); poly(g, it.pts); g.stroke(); g.setLineDash([]); }
+        if (t === 'steps') {                                         // garis anak tangga
+          var dp = densify(it.pts, 0.6); g.strokeStyle = '#ffffff'; g.lineWidth = 0.08 / T.res;
+          for (var i = 0; i < dp.length - 1; i++) {
+            var a = dp[i], b = dp[i + 1], dx = b[0] - a[0], dz = b[1] - a[1], L = Math.hypot(dx, dz) || 1, nx = -dz / L * 1.4, nz = dx / L * 1.4;
+            g.beginPath(); g.moveTo(PX(a[0] + nx), PZ(a[1] + nz)); g.lineTo(PX(a[0] - nx), PZ(a[1] - nz)); g.stroke();
+          }
+        }
+      });
+    });
+    g.globalAlpha = 1;
+    items.forEach(function (it) { if (it.kind[0] === 'B') { g.fillStyle = 'rgba(80,80,80,0.35)'; poly(g, it.pts); g.closePath(); g.fill(); } });
+  }
+  function paintContours(g) {
+    var st = 2, nx = Math.ceil((T.x1 - T.x0) / st) + 1, nz = Math.ceil((T.z1 - T.z0) / st) + 1, grid = [];
+    for (var j = 0; j < nz; j++) { grid.push([]); for (var i = 0; i < nx; i++) grid[j].push(elevAbs(T.x0 + i * st, T.z0 + j * st)); }
+    var lo = Math.floor(Math.min.apply(0, grid.map(function (r) { return Math.min.apply(0, r); }))), hi = Math.ceil(Math.max.apply(0, grid.map(function (r) { return Math.max.apply(0, r); })));
+    for (var lv = lo; lv <= hi; lv++) {
+      var major = lv % 5 === 0;
+      g.strokeStyle = major ? 'rgba(90,60,30,0.75)' : 'rgba(90,60,30,0.35)'; g.lineWidth = major ? 2.2 : 1.1; g.beginPath();
+      for (var j2 = 0; j2 < nz - 1; j2++) for (var i2 = 0; i2 < nx - 1; i2++) {
+        var c = [grid[j2][i2], grid[j2][i2 + 1], grid[j2 + 1][i2 + 1], grid[j2 + 1][i2]], P = [[0, 0], [1, 0], [1, 1], [0, 1]], cut = [];
+        for (var e = 0; e < 4; e++) {
+          var a = c[e], b = c[(e + 1) % 4];
+          if ((a - lv) * (b - lv) < 0) { var t = (lv - a) / (b - a), pa = P[e], pb = P[(e + 1) % 4]; cut.push([i2 + pa[0] + (pb[0] - pa[0]) * t, j2 + pa[1] + (pb[1] - pa[1]) * t]); }
+        }
+        for (var q = 0; q + 1 < cut.length; q += 2) { g.moveTo(cut[q][0] * st / T.res, cut[q][1] * st / T.res); g.lineTo(cut[q + 1][0] * st / T.res, cut[q + 1][1] * st / T.res); }
+      }
+      g.stroke();
+      if (major) {                                                 // angka kontur
+        g.font = '600 22px system-ui,sans-serif'; g.fillStyle = 'rgba(90,60,30,0.9)';
+        for (var j3 = 20; j3 < nz - 1; j3 += 60) for (var i3 = 20; i3 < nx - 1; i3 += 60) {
+          var v0 = grid[j3][i3], v1 = grid[j3][i3 + 1]; if ((v0 - lv) * (v1 - lv) < 0) g.fillText(lv + ' m', i3 * st / T.res + 4, j3 * st / T.res - 4);
+        }
+      }
+    }
+  }
+  var texCache = {}, orthoCv = null;
+  (function () {                                               // foto udara resmi ITB (2016), sudah diluruskan ke koordinat model
+    var img = new Image();
+    img.onload = function () {
+      var c = document.createElement('canvas'); c.width = TW; c.height = TH; var g = c.getContext('2d');
+      g.drawImage(img, 0, 0, TW, TH);
+      try {
+        var d = g.getImageData(0, 0, TW, TH), a = d.data;
+        for (var i = 0; i < a.length; i += 4) { var mn = Math.min(a[i], a[i + 1], a[i + 2]); if (mn > 232) a[i + 3] = 0; }
+        g.putImageData(d, 0, 0);
+      } catch (e) {}
+      orthoCv = c; texCache = {}; refreshGround();
+    };
+    img.src = 'ortho.jpg';
+  })();
+  function groundTex(slope, contour, photo) {
+    var key = (slope ? 's' : 'n') + (contour ? 'c' : '') + (photo && orthoCv ? 'p' : '');
+    if (!texCache[key]) {
+      texCache[key] = canvasTex(TW, TH, function (g) {
+        paintBase(g, slope);
+        if (photo && orthoCv) {
+          g.globalAlpha = slope ? 0.45 : 1; g.drawImage(orthoCv, 0, 0); g.globalAlpha = 1;
+          items.forEach(function (it) {                           // tangga luar tetap ditandai di atas foto
+            if (it.kind !== 'Hsteps') return; g.strokeStyle = 'rgba(214,47,47,0.9)'; g.lineWidth = 1.6 / T.res; g.lineCap = 'round'; poly(g, it.pts); g.stroke();
+          });
+        }
+        if (contour) paintContours(g);
+      });
+    }
+    return texCache[key];
+  }
+
+  /* ---------- permukaan tanah (terrain) ---------- */
+  var tw = T.x1 - T.x0, td = T.z1 - T.z0;
+  var tg = new THREE.PlaneGeometry(tw, td, Math.round(tw / 4), Math.round(td / 4));
+  tg.rotateX(-Math.PI / 2); tg.translate(T.x0 + tw / 2, 0, T.z0 + td / 2);
+  var tp = tg.attributes.position;
+  for (var vi = 0; vi < tp.count; vi++) tp.setY(vi, hy(tp.getX(vi), tp.getZ(vi)));
+  tg.computeVertexNormals();
+  var groundMat = new THREE.MeshLambertMaterial({ map: groundTex(false, true, true) });
+  var ground = new THREE.Mesh(tg, groundMat); scene.add(ground);
+  var minY = 1e9; for (var vj = 0; vj < tp.count; vj++) minY = Math.min(minY, tp.getY(vj));
+  var outer = new THREE.Mesh(new THREE.PlaneGeometry(2600, 2600), mat(0xc9c8bf)); outer.rotation.x = -Math.PI / 2; outer.position.y = minY - 0.6; scene.add(outer);
+  var slopeOn = false, contourOn = true, photoOn = true;
+  function refreshGround() { groundMat.map = groundTex(slopeOn, contourOn, photoOn); groundMat.needsUpdate = true;
+    document.getElementById('legMap').style.display = slopeOn ? 'none' : 'flex'; document.getElementById('legSlope').style.display = slopeOn ? 'flex' : 'none'; }
+
+  /* ---------- jalan: data untuk snapping, profil & sorotan ---------- */
+  var segs = [], roadByName = {}, allRoads = [];
+  function ribbon3(pts, w, off, material, parent) {              // pita yang menempel di permukaan tanah
+    var dp = densify(pts, 3), pos = [], idx = [], n = 0;
+    for (var i = 0; i < dp.length - 1; i++) {
+      var a = dp[i], b = dp[i + 1], dx = b[0] - a[0], dz = b[1] - a[1], L = Math.hypot(dx, dz);
+      if (L < 0.01) continue;
+      var nx = -dz / L * w / 2, nz = dx / L * w / 2, ya = hy(a[0], a[1]) + off, yb = hy(b[0], b[1]) + off;
+      pos.push(a[0] + nx, ya, a[1] + nz, a[0] - nx, ya, a[1] - nz, b[0] + nx, yb, b[1] + nz, b[0] - nx, yb, b[1] - nz);
+      idx.push(n, n + 2, n + 1, n + 1, n + 2, n + 3); n += 4;
+    }
+    var g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals();
+    var m = new THREE.Mesh(g, material); (parent || scene).add(m); return m;
+  }
+  items.forEach(function (it) {
+    if (it.kind[0] !== 'H') return;
+    var t = it.kind.slice(1), w = roadW(it);
+    if (CFG.mainRoads.indexOf(disp(it)) >= 0) ribbon3(it.pts, Math.max(1.4, w * 0.3), 0.25, mat(0xf2c14e), G.main);
+    for (var s = 0; s < it.pts.length - 1; s++) if (t !== 'corridor' && t !== 'steps') segs.push({ a: it.pts[s], b: it.pts[s + 1], w: w });
+    var dn = disp(it);
+    if (dn && t !== 'steps') {
+      var L = 0; for (var q = 0; q < it.pts.length - 1; q++) L += Math.hypot(it.pts[q + 1][0] - it.pts[q][0], it.pts[q + 1][1] - it.pts[q][1]);
+      if (!roadByName[dn]) roadByName[dn] = { L: 0, parts: [] };
+      roadByName[dn].parts.push(it.pts); if (L > roadByName[dn].L) { roadByName[dn].L = L; roadByName[dn].pts = it.pts; }
+    }
+  });
+  Object.keys(roadByName).forEach(function (n) {
+    if (n === 'Koridor Labtek V') return;
+    var pts = roadByName[n].pts, mid = Math.floor((pts.length - 1) / 2), a = pts[mid], b = pts[mid + 1] || a, x = (a[0] + b[0]) / 2, z = (a[1] + b[1]) / 2;
+    var main = CFG.mainRoads.indexOf(n) >= 0;
+    label(n, x, hy(x, z) + 3, z, main ? 3.0 : 2.2, main ? 900 : 260, main ? 'rgba(255,240,200,0.95)' : null);
+  });
+  function nearestSeg(x, z, maxD) {
+    var best = null, bd = maxD;
+    segs.forEach(function (s) {
+      var ax = s.a[0], az = s.a[1], dx = s.b[0] - ax, dz = s.b[1] - az, L2 = dx * dx + dz * dz; if (!L2) return;
+      var t = Math.max(0, Math.min(1, ((x - ax) * dx + (z - az) * dz) / L2));
+      var px = ax + t * dx, pz = az + t * dz, d = Math.hypot(x - px, z - pz);
+      if (d < bd) { bd = d; best = { s: s, px: px, pz: pz, d: d, ang: Math.atan2(dz, dx) }; }
+    });
+    return best;
+  }
+
+  /* ---------- tangga luar (OSM) sebagai penanda bahaya ---------- */
+  var nSteps = 0;
+  items.forEach(function (it) {
+    if (it.kind !== 'Hsteps') return;
+    nSteps++;
+    var dp = densify(it.pts, 1), m = dp[Math.floor(dp.length / 2)], y = hy(m[0], m[1]);
+    var post = boxB(m[0] - 0.08, m[0] + 0.08, y, y + 3.2, m[1] - 0.08, m[1] + 0.08, mat(0x8a1f1f), G.steps);
+    var sign = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 0.9, 0.12, 3), mat(0xd62f2f)); sign.rotation.x = Math.PI / 2; sign.position.set(m[0], y + 3.6, m[1]); G.steps.add(sign);
+    sign.userData.lookCam = true;
+    var L = 0; for (var i = 0; i < it.pts.length - 1; i++) L += Math.hypot(it.pts[i + 1][0] - it.pts[i][0], it.pts[i + 1][1] - it.pts[i][1]);
+    post.userData = { stepInfo: (it.name || 'Tangga luar') + ' · panjang ±' + fmt(L) + ' m (data OSM; jumlah anak tangga & tinggi tidak tercatat)' };
+    sign.userData.stepInfo = post.userData.stepInfo;
+  });
+
+  /* ---------- tekstur dinding ---------- */
+  function wallTex(base, win) {
+    var t = canvasTex(64, 64, function (g, w, h) {
+      g.fillStyle = base; g.fillRect(0, 0, w, h);
+      g.fillStyle = win; g.fillRect(10, 18, 44, 30);
+      g.fillStyle = 'rgba(0,0,0,0.12)'; g.fillRect(0, 60, w, 4);
+    });
+    t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(1 / 3.2, 1 / CFG.floorH);
+    return t;
+  }
+  var wallMat = new THREE.MeshLambertMaterial({ map: wallTex('#e4e2da', '#8ea4b0') });
+  var roofMat = mat(0xbfc0bb);
+  var ghostWall = new THREE.MeshLambertMaterial({ color: 0xd9dcd6, transparent: true, opacity: 0.18, depthWrite: false });
+  var ghostRoof = new THREE.MeshLambertMaterial({ color: 0xbfc0bb, transparent: true, opacity: 0.18, depthWrite: false });
+  var buildings = [], searchIdx = [];
+
+  /* ---------- gedung (extrude dari footprint, duduk di permukaan tanah) ---------- */
+  function gable(x0, x1, z0, z1, yb, rise, color, parent) {
+    var o = 1.4, m = new THREE.MeshLambertMaterial({ color: color, side: THREE.DoubleSide });
+    var mg = new THREE.MeshLambertMaterial({ color: 0xd8d2c4, side: THREE.DoubleSide });
+    x0 -= o; x1 += o; z0 -= o; z1 += o;
+    if (x1 - x0 >= z1 - z0) {
+      var zm = (z0 + z1) / 2;
+      quad([x0, yb, z0], [x1, yb, z0], [x1, yb + rise, zm], [x0, yb + rise, zm], m, parent);
+      quad([x0, yb, z1], [x1, yb, z1], [x1, yb + rise, zm], [x0, yb + rise, zm], m, parent);
+      tri([x0 + o, yb, z0 + o], [x0 + o, yb + rise - 0.6, zm], [x0 + o, yb, z1 - o], mg, parent);
+      tri([x1 - o, yb, z0 + o], [x1 - o, yb + rise - 0.6, zm], [x1 - o, yb, z1 - o], mg, parent);
+    } else {
+      var xm = (x0 + x1) / 2;
+      quad([x0, yb, z0], [x0, yb, z1], [xm, yb + rise, z1], [xm, yb + rise, z0], m, parent);
+      quad([x1, yb, z0], [x1, yb, z1], [xm, yb + rise, z1], [xm, yb + rise, z0], m, parent);
+      tri([x0 + o, yb, z0 + o], [xm, yb + rise - 0.6, z0 + o], [x1 - o, yb, z0 + o], mg, parent);
+      tri([x0 + o, yb, z1 - o], [xm, yb + rise - 0.6, z1 - o], [x1 - o, yb, z1 - o], mg, parent);
+    }
+  }
+  function footBase(pts) {                                       // lantai dasar = rata-rata tanah di bawah tapak
+    var ys = densify(pts, 6).map(function (p) { return hy(p[0], p[1]); });
+    var c = centroid(pts); ys.push(hy(c[0], c[1]));
+    return { mean: ys.reduce(function (a, b) { return a + b; }, 0) / ys.length, min: Math.min.apply(0, ys), max: Math.max.apply(0, ys) };
+  }
+  items.forEach(function (it) {
+    if (it.kind[0] !== 'B' || it.name === 'Labtek V') return;
+    var lv = parseInt(it.kind.slice(1), 10) || CFG.defaultLevels, h = lv * CFG.floorH, fb = footBase(it.pts);
+    var y0 = fb.min - 0.4, top = fb.mean + h;
+    var g = new THREE.ExtrudeGeometry(shapeOf(it.pts), { depth: top - y0, bevelEnabled: false });
+    g.rotateX(-Math.PI / 2); g.translate(0, y0, 0);
+    var m = new THREE.Mesh(g, [roofMat, wallMat]);
+    m.userData = { name: disp(it), osm: it.label && it.name && it.name !== it.label ? it.name : '', levels: lv, base: [roofMat, wallMat], floorAbs: fb.mean + H0, drop: fb.max - fb.min, c: centroid(it.pts) };
+    if (disp(it)) searchIdx.push({ t: disp(it), x: centroid(it.pts)[0], z: centroid(it.pts)[1] });
+    G.others.add(m); buildings.push(m);
+    m.add(new THREE.LineSegments(new THREE.EdgesGeometry(g, 30), new THREE.LineBasicMaterial({ color: 0x7c8488, transparent: true, opacity: 0.5 })));
+    var c = centroid(it.pts);
+    if (CFG.gableRoof.indexOf(it.name) >= 0) {
+      var xs = it.pts.map(function (p) { return p[0]; }), zs = it.pts.map(function (p) { return p[1]; });
+      gable(Math.min.apply(0, xs), Math.max.apply(0, xs), Math.min.apply(0, zs), Math.max.apply(0, zs), top, 6, 0x9a4b2f, G.roofs);
+      top += 6;
+    }
+    if (disp(it)) { var lt = disp(it).split(' / ')[0]; if (lt.length > 46) lt = lt.slice(0, 44) + '…'; label(lt, c[0], top + 3, c[1], lv >= 4 ? 2.4 : 2.0, lv >= 4 ? 330 : 170); }
+  });
+
+  /* ---------- LABTEK V (detail) ---------- */
+  var L5 = CFG.labtek5, L5fb = footBase([[L5.x0, L5.z0], [L5.x1, L5.z0], [L5.x1, L5.z1], [L5.x0, L5.z1]]);
+  (function () {
+    var L = L5, H = L.levels * CFG.floorH, a = L.arcade, P = G.l5;
+    P.position.y = L5fb.mean;
+    var accentWall = new THREE.MeshLambertMaterial({ map: wallTex('#f0c8a8', '#6f8794') });
+    function exRect(x0, x1, z0, z1, y0, y1) {
+      var g = new THREE.ExtrudeGeometry(shapeOf([[x0, z0], [x1, z0], [x1, z1], [x0, z1]]), { depth: y1 - y0, bevelEnabled: false });
+      g.rotateX(-Math.PI / 2); g.translate(0, y0, 0);
+      var m = new THREE.Mesh(g, [mat(0xcfc3b4), accentWall]); P.add(m); return m;
+    }
+    var info5 = { name: '46 · Labtek V – Benny Subianto I', osm: 'HMIF ITB: lantai 1 &amp; lantai 4 (peta HMPS AMI 2026)', levels: L.levels, l5: true, floorAbs: L5fb.mean + H0, drop: L5fb.max - L5fb.min };
+    var inner = exRect(L.x0 + a, L.x1 - a, L.z0 + a, L.z1 - a, 0, CFG.floorH); inner.userData = info5;
+    var cm = mat(0xf3efe6);
+    for (var x = L.x0 + 0.3; x <= L.x1 - 0.2; x += L.colStep) {
+      boxB(x - 0.25, x + 0.25, 0, CFG.floorH, L.z0 + 0.05, L.z0 + 0.55, cm, P);
+      boxB(x - 0.25, x + 0.25, 0, CFG.floorH, L.z1 - 0.55, L.z1 - 0.05, cm, P);
+    }
+    for (var z = L.z0 + 0.3; z <= L.z1 - 0.2; z += L.colStep) {
+      boxB(L.x0 + 0.05, L.x0 + 0.55, 0, CFG.floorH, z - 0.25, z + 0.25, cm, P);
+      boxB(L.x1 - 0.55, L.x1 - 0.05, 0, CFG.floorH, z - 0.25, z + 0.25, cm, P);
+    }
+    var up = exRect(L.x0, L.x1, L.z0, L.z1, CFG.floorH, H); up.userData = info5;
+    for (var f = 1; f <= L.levels; f++) boxB(L.x0 - 0.15, L.x1 + 0.15, f * CFG.floorH - 0.18, f * CFG.floorH + 0.08, L.z0 - 0.15, L.z1 + 0.15, mat(L.color), P);
+    gable(L.x0, L.x1, L.z0, L.z1, L5fb.mean + H, 6.5, 0xb04a24, G.roofs);
+    // plint/peninggian lantai dasar menutupi beda tinggi tanah di bawah tapak
+    boxB(L.x0, L.x1, L5fb.min - L5fb.mean - 0.3, 0.12, L.z0, L.z1, mat(0xd8c7a8), P);
+    boxB(-97.5, -92.5, 0, 2.6, L.z1 - a - 0.05, L.z1 - a + 0.05, mat(0x4e5a60), P);
+    boxB(-97.5, -92.5, 0, 2.6, L.z0 + a - 0.05, L.z0 + a + 0.05, mat(0x4e5a60), P);
+    var sx = -98, sw = 3;
+    boxB(sx - sw / 2, sx + sw / 2, 3.0, 3.2, -24, -4, mat(0xa7aaa5), P);
+    for (var zz = -23; zz < -4; zz += 4) { boxB(sx - sw / 2, sx - sw / 2 + 0.2, 0, 3.0, zz, zz + 0.2, cm, P); boxB(sx + sw / 2 - 0.2, sx + sw / 2, 0, 3.0, zz, zz + 0.2, cm, P); }
+    buildings.push(inner, up);
+    searchIdx.push({ t: '46 · Labtek V – Benny Subianto I', x: -79, z: 10 });
+    label('46 · Labtek V – Benny Subianto I · 4 lantai · ±' + (L.x1 - L.x0) + ' × ' + (L.z1 - L.z0) + ' m', (L.x0 + L.x1) / 2, L5fb.mean + H + 9, (L.z0 + L.z1) / 2, 3.2, 1e9, 'rgba(255,226,200,0.96)');
+    label('Lantai dasar ±' + fmt(L5fb.mean + H0, 0) + ' m dpl', L.x0 + 14, L5fb.mean + 1.6, L.z1 + 1.4, 1.3, 120);
+  })();
+
+  /* ---------- tugu & pohon ---------- */
+  items.forEach(function (it) {
+    if (it.kind !== 'Mmonument') return;
+    var p = it.pts[0], y = hy(p[0], p[1]);
+    boxB(p[0] - 1.2, p[0] + 1.2, y, y + 1.2, p[1] - 1.2, p[1] + 1.2, mat(0x9b9a94));
+    boxB(p[0] - 0.4, p[0] + 0.4, y + 1.2, y + 3.4, p[1] - 0.4, p[1] + 0.4, mat(0x6b6b66));
+    label(it.name + ' · datum ±' + fmt(H0, 0) + ' m dpl', p[0], y + 5.5, p[1], 2.2, 200);
+  });
+  (function () {
+    var rnd = (function (s) { return function () { s = (s * 16807) % 2147483647; return s / 2147483647; }; })(42);
+    var bpolys = items.filter(function (it) { return it.kind[0] === 'B'; }).map(function (it) { return it.pts; });
+    var parks = items.filter(function (it) { return /^L(park|garden)|^U(grass|allotments)/.test(it.kind) && !/Lapangan (Cinta|Sipil|SR|Radar)/.test(it.name) && it.pts.length > 2; }).map(function (it) { return it.pts; });
+    var pts = [];
+    parks.forEach(function (poly) {
+      var xs = poly.map(function (p) { return p[0]; }), zs = poly.map(function (p) { return p[1]; });
+      var x0 = Math.min.apply(0, xs), x1 = Math.max.apply(0, xs), z0 = Math.min.apply(0, zs), z1 = Math.max.apply(0, zs);
+      var area = 0; for (var i = 0, j = poly.length - 1; i < poly.length; j = i++) area += (poly[j][0] + poly[i][0]) * (poly[j][1] - poly[i][1]);
+      var n = Math.min(260, Math.round(Math.abs(area / 2) / 140)), tries = 0;
+      while (n > 0 && tries++ < n * 8) {
+        var x = x0 + rnd() * (x1 - x0), z = z0 + rnd() * (z1 - z0);
+        if (!inPoly(x, z, poly)) continue;
+        if (bpolys.some(function (b) { return inPoly(x, z, b); })) continue;
+        var ns = nearestSeg(x, z, 6); if (ns && ns.d < ns.s.w / 2 + 2) continue;
+        pts.push([x, z, 0.7 + rnd() * 0.6]); n--;
+      }
+    });
+    var trunk = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.25, 0.35, 4, 6), mat(0x6b5136), pts.length);
+    var crown = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(3.2, 0), mat(0x5c8f45), pts.length);
+    var M = new THREE.Matrix4(), S = new THREE.Vector3(), Q = new THREE.Quaternion(), V = new THREE.Vector3();
+    pts.forEach(function (p, i) {
+      var y = hy(p[0], p[1]); S.set(p[2], p[2], p[2]);
+      M.compose(V.set(p[0], y + 2 * p[2], p[1]), Q, S); trunk.setMatrixAt(i, M);
+      M.compose(V.set(p[0], y + 5.6 * p[2], p[1]), Q, S); crown.setMatrixAt(i, M);
+    });
+    G.trees.add(trunk); G.trees.add(crown);
+  })();
+
+
+  /* ===================== RUJUKAN PETA AMI 2026 & CAPANTOUR ===================== */
+  var REFG = { fac: new THREE.Group(), gates: new THREE.Group(), hm: new THREE.Group(), pts: new THREE.Group() };
+  for (var rg in REFG) scene.add(REFG[rg]);
+  REFG.hm.visible = false;
+  // label titik bernomor (lapangan, plaza, kolam, dll.) + label area utara
+  REF.amiPoints.forEach(function (p) {
+    label(p.n + ' · ' + (p.name.length > 40 ? p.name.slice(0, 38) + '…' : p.name), p.x, hy(p.x, p.z) + 3, p.z, 2.0, 260, 'rgba(232,244,255,0.95)');
+    searchIdx.push({ t: p.n + ' · ' + p.name, x: p.x, z: p.z });
+  });
+  REF.north.forEach(function (p) { label(p.name, p.x, hy(p.x, p.z) + 2.5, p.z, 1.9, 220); searchIdx.push({ t: p.name, x: p.x, z: p.z }); });
+  // ikon fasilitas
+  var iconTex = {};
+  function iconFor(t) {
+    if (iconTex[t]) return iconTex[t];
+    var f = CFG.fac[t], c = document.createElement('canvas'); c.width = c.height = 64; var g = c.getContext('2d');
+    g.fillStyle = '#ffffff'; g.beginPath(); g.arc(32, 32, 31, 0, 7); g.fill();
+    g.fillStyle = f[1]; g.beginPath(); g.arc(32, 32, 26, 0, 7); g.fill();
+    g.fillStyle = '#fff'; g.font = '700 ' + (f[2].length > 1 ? 24 : 32) + 'px system-ui,sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(f[2], 32, 34);
+    iconTex[t] = new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), depthTest: false }); return iconTex[t];
+  }
+  var facGroups = {}, facOn = {}, titik = [];
+  Object.keys(CFG.fac).forEach(function (t) { var g = new THREE.Group(); facGroups[t] = g; REFG.fac.add(g); facOn[t] = !!CFG.fac[t][3]; g.visible = facOn[t]; });
+  REF.syms.forEach(function (sy) {
+    if (!CFG.fac[sy.t]) return;
+    var sp = new THREE.Sprite(iconFor(sy.t)); sp.scale.set(2.4, 2.4, 1); sp.position.set(sy.x, hy(sy.x, sy.z) + 2.2, sy.z); sp.renderOrder = 25;
+    sp.userData = { maxD: 420, always: true, fac: sy.t }; facGroups[sy.t].add(sp); labels.push(sp);
+    if (sy.t === 'TITIK KUMPUL') titik.push(sy);
+  });
+  function renderFac() {
+    var cnt = {}; REF.syms.forEach(function (sy) { cnt[sy.t] = (cnt[sy.t] || 0) + 1; });
+    var box = document.getElementById('facList'); box.innerHTML = '';
+    Object.keys(CFG.fac).forEach(function (t) {
+      var f = CFG.fac[t], row = document.createElement('label'); row.className = 'facRow';
+      row.innerHTML = '<input type="checkbox"' + (facOn[t] ? ' checked' : '') + '><i style="background:' + f[1] + '">' + f[2] + '</i><span>' + f[0] + '</span><em>' + (cnt[t] || 0) + '</em>';
+      row.querySelector('input').onchange = function () { facOn[t] = this.checked; facGroups[t].visible = this.checked; };
+      box.appendChild(row);
+    });
+  }
+  renderFac();
+  function nearestTitik(x, z) {
+    var b = null, bd = 1e9; titik.forEach(function (p) { var d = Math.hypot(p.x - x, p.z - z); if (d < bd) { bd = d; b = p; } }); return b ? { p: b, d: bd } : null;
+  }
+  // gerbang
+  var GK = 'ganesa-gates-v1', gatePos = {};
+  try { gatePos = JSON.parse(localStorage.getItem(GK) || '{}'); } catch (e) {}
+  REF.gates.forEach(function (g) { if (gatePos[g.name]) { g.x = gatePos[g.name][0]; g.z = gatePos[g.name][1]; g.userSet = true; } });
+  function buildGates() {
+    while (REFG.gates.children.length) { var o = REFG.gates.children[0]; var li = labels.indexOf(o); if (li >= 0) labels.splice(li, 1); REFG.gates.remove(o); }
+    REF.gates.forEach(function (g, i) {
+      if (g.x == null) return;
+      var y = hy(g.x, g.z), col = g.live ? 0x1f9d55 : 0xc62828, grp = new THREE.Group(); grp.position.set(g.x, y, g.z); REFG.gates.add(grp);
+      boxB(-2.2, -1.8, 0, 3.2, -0.2, 0.2, mat(col), grp); boxB(1.8, 2.2, 0, 3.2, -0.2, 0.2, mat(col), grp); boxB(-2.2, 2.2, 2.9, 3.3, -0.12, 0.12, mat(col), grp);
+      var hit = new THREE.Mesh(new THREE.BoxGeometry(6, 5, 6), new THREE.MeshBasicMaterial({ visible: false })); hit.position.y = 2; hit.userData.gate = i; grp.add(hit);
+      var nm = g.name.split(' — ')[0], sp = makeTag((g.live ? '⇄ ' : '✕ ') + nm + (g.hours && g.hours !== '?' && g.hours !== '–' ? ' · ' + g.hours : ''));
+      sp.position.set(g.x, y + 5.2, g.z); sp.userData.maxD = 1400; sp.userData.always = true; sp.scale.multiplyScalar(1.6); sp.userData.s0 = null; REFG.gates.add(sp);
+    });
+  }
+  buildGates();
+  var placingGate = -1;
+  function renderGates() {
+    var ul = document.getElementById('gateList'); ul.innerHTML = '';
+    REF.gates.forEach(function (g, i) {
+      var li = document.createElement('li');
+      li.innerHTML = '<b style="color:' + (g.live ? '#1f7a43' : '#b3261e') + '">' + (g.live ? '● ' : '✕ ') + g.name + '</b><div class="meta">Jam ' + g.hours + ' · ' + g.fn + ' · akses ' + g.acc + (g.live ? '' : ' · <b>non-fungsional</b>') +
+        (g.x == null ? ' · <span class="mid">belum ada posisi di peta</span>' : g.userSet ? ' · posisi diatur sendiri' : '') + '</div>';
+      if (g.x != null) { var b1 = document.createElement('button'); b1.textContent = 'Lihat'; b1.onclick = function () { flyTo(g.x, g.z); }; li.appendChild(b1); }
+      var b2 = document.createElement('button'); b2.textContent = g.x == null ? 'Tetapkan posisi' : 'Pindahkan'; b2.onclick = function () { placingGate = i; setMode('gate'); hint.textContent = 'Klik lokasi ' + g.name + ' di peta.'; }; li.appendChild(b2);
+      ul.appendChild(li);
+    });
+  }
+  renderGates();
+  // himpunan
+  REF.hmps.forEach(function (h) {
+    var sp = makeTag(h.s); sp.position.set(h.x, hy(h.x, h.z) + 3.4, h.z); sp.userData.maxD = 260; sp.userData.always = true; sp.userData.hm = h; REFG.hm.add(sp);
+    var dot = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 2.4, 10), mat(0x7b1fa2)); dot.position.set(h.x, hy(h.x, h.z) + 1.2, h.z); dot.userData.hm = h; REFG.hm.add(dot);
+    searchIdx.push({ t: h.s + ' (himpunan)', x: h.x, z: h.z });
+  });
+  // pencarian
+  (function () {
+    var dl = document.getElementById('searchList'), seen = {};
+    searchIdx.forEach(function (q) { if (seen[q.t]) return; seen[q.t] = 1; var o = document.createElement('option'); o.value = q.t; dl.appendChild(o); });
+    var inp = document.getElementById('search');
+    function go2() {
+      var v = inp.value.trim().toLowerCase(); if (!v) return;
+      var hit = searchIdx.filter(function (q) { return q.t.toLowerCase() === v; })[0] || searchIdx.filter(function (q) { return q.t.toLowerCase().indexOf(v) >= 0 || q.t.toLowerCase().split(' · ')[0] === v; })[0];
+      if (!hit) { inp.style.borderColor = '#b3261e'; return; } inp.style.borderColor = '';
+      flyTo(hit.x, hit.z); info.style.display = 'block'; info.innerHTML = '<b>' + hit.t + '</b>';
+    }
+    inp.addEventListener('change', go2); inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') go2(); });
+  })();
+
+  /* ===================== PROFIL JALAN ===================== */
+  function profileOf(pts) {
+    var dp = densify(pts, 2), out = [], s = 0;
+    dp.forEach(function (p, i) { if (i) s += Math.hypot(p[0] - dp[i - 1][0], p[1] - dp[i - 1][1]); out.push({ s: s, x: p[0], z: p[1], e: elevAbs(p[0], p[1]) }); });
+    return out;
+  }
+  function gradStats(pr, win) {                                   // gradien rata-rata per jendela "win" meter
+    var maxG = 0, at = null, worst = [];
+    for (var i = 0, j = 0; i < pr.length; i++) {
+      while (j < pr.length && pr[j].s - pr[i].s < win) j++;
+      if (j >= pr.length) break;
+      var g = (pr[j].e - pr[i].e) / (pr[j].s - pr[i].s) * 100;
+      if (Math.abs(g) > Math.abs(maxG)) { maxG = g; at = (pr[i].s + pr[j].s) / 2; }
+    }
+    var L = pr[pr.length - 1].s, dE = pr[pr.length - 1].e - pr[0].e;
+    var es = pr.map(function (p) { return p.e; });
+    return { L: L, dE: dE, avg: L ? dE / L * 100 : 0, max: maxG, at: at, min: Math.min.apply(0, es), maxE: Math.max.apply(0, es) };
+  }
+  function svgProfile(pr, st) {
+    var W = 280, Hh = 140, pl = 34, pb = 18, pt = 8, pr2 = 6;
+    var e0 = Math.floor(st.min - 1), e1 = Math.ceil(st.maxE + 1);
+    function X(s) { return pl + (W - pl - pr2) * s / st.L; } function Y(e) { return pt + (Hh - pt - pb) * (1 - (e - e0) / (e1 - e0)); }
+    var d = pr.map(function (p, i) { return (i ? 'L' : 'M') + X(p.s).toFixed(1) + ' ' + Y(p.e).toFixed(1); }).join(' ');
+    var area = d + ' L' + X(st.L).toFixed(1) + ' ' + Y(e0) + ' L' + X(0) + ' ' + Y(e0) + ' Z';
+    var grid = '', step = (e1 - e0) > 12 ? 5 : 2;
+    for (var e = Math.ceil(e0 / step) * step; e <= e1; e += step) grid += '<line x1="' + pl + '" x2="' + (W - pr2) + '" y1="' + Y(e) + '" y2="' + Y(e) + '" stroke="#e3e7e9"/><text x="' + (pl - 4) + '" y="' + (Y(e) + 3) + '" font-size="9" text-anchor="end" fill="#5b666c">' + e + '</text>';
+    var sx = st.L > 800 ? 250 : st.L > 300 ? 100 : 50;
+    for (var s = 0; s <= st.L; s += sx) grid += '<text x="' + X(s) + '" y="' + (Hh - 5) + '" font-size="9" text-anchor="middle" fill="#5b666c">' + s + ' m</text>';
+    // ruas dengan gradien > 8,33% diwarnai
+    var hot = '';
+    for (var i = 0, j = 0; i < pr.length - 1; i++) {
+      while (j < pr.length - 1 && pr[j].s - pr[i].s < 20) j++;
+      var g = Math.abs((pr[j].e - pr[i].e) / Math.max(1, pr[j].s - pr[i].s) * 100);
+      if (g >= 8.33) hot += '<line x1="' + X(pr[i].s) + '" x2="' + X(pr[i + 1].s) + '" y1="' + Y(pr[i].e) + '" y2="' + Y(pr[i + 1].e) + '" stroke="' + (g >= 12 ? '#b3261e' : '#e08a00') + '" stroke-width="3"/>';
+    }
+    var mk = st.at != null ? '<line x1="' + X(st.at) + '" x2="' + X(st.at) + '" y1="' + pt + '" y2="' + (Hh - pb) + '" stroke="#b3261e" stroke-dasharray="3 3"/>' : '';
+    return '<svg viewBox="0 0 ' + W + ' ' + Hh + '">' + grid + '<path d="' + area + '" fill="rgba(31,95,139,0.12)"/><path d="' + d + '" fill="none" stroke="#1f5f8b" stroke-width="1.8"/>' + hot + mk +
+      '<text x="' + pl + '" y="' + (pt + 9) + '" font-size="9" fill="#5b666c">m dpl</text></svg>';
+  }
+  var selRoad = document.getElementById('selRoad');
+  var roadNames = Object.keys(roadByName).filter(function (n) { return roadByName[n].L > 40; }).sort(function (a, b) {
+    var ma = CFG.mainRoads.indexOf(a) >= 0, mb = CFG.mainRoads.indexOf(b) >= 0; return ma === mb ? a.localeCompare(b) : ma ? -1 : 1;
+  });
+  roadNames.forEach(function (n) { var o = document.createElement('option'); o.value = n; o.textContent = n + (CFG.mainRoads.indexOf(n) >= 0 ? ' ★' : ''); selRoad.appendChild(o); });
+  function showProfile(n) {
+    var r = roadByName[n]; if (!r) return;
+    var pr = profileOf(r.pts), st = gradStats(pr, 20);
+    var cls = slopeCls(st.max);
+    document.getElementById('profOut').innerHTML = svgProfile(pr, st) +
+      '<table class="kv">' +
+      '<tr><td>Panjang ruas terpanjang</td><td>' + fmt(st.L, 0) + ' m</td></tr>' +
+      '<tr><td>Elevasi awal → akhir</td><td>' + fmt(pr[0].e, 1) + ' → ' + fmt(pr[pr.length - 1].e, 1) + ' m dpl</td></tr>' +
+      '<tr><td>Beda tinggi total</td><td>' + (st.dE >= 0 ? '+' : '') + fmt(st.dE, 1) + ' m</td></tr>' +
+      '<tr><td>Gradien rata-rata</td><td>' + pct(st.avg) + '</td></tr>' +
+      '<tr><td>Gradien maks (jendela 20 m)</td><td class="' + cls + '">' + pct(st.max) + '</td></tr>' +
+      '</table><p class="note">Garis oranye: ruas ≥ 8,33% (lebih curam dari ramp 1:12). Merah: ≥ 12%. Garis putus: titik tercuram. Rute berwarna kuning tebal di peta.</p>';
+    while (G.prof.children.length) G.prof.remove(G.prof.children[0]);
+    r.parts.forEach(function (pts) { ribbon3(pts, 3, 0.35, mat(0x1f5f8b, { transparent: true, opacity: 0.85 }), G.prof); });
+  }
+  selRoad.onchange = function () { showProfile(selRoad.value); var r = roadByName[selRoad.value]; var c = r.pts[Math.floor(r.pts.length / 2)]; target.set(c[0], hy(c[0], c[1]), c[1]); setCam(); };
+
+  /* ===================== BOOTH ACARA ===================== */
+  var TYPES = {}; CFG.types.forEach(function (t) { TYPES[t.id] = t; });
+  var sel = document.getElementById('selType');
+  CFG.types.forEach(function (t) { var o = document.createElement('option'); o.value = t.id; o.textContent = t.name; sel.appendChild(o); });
+  var booths = [], selected = null, mode = null, uid = 1;
+  var LS_KEY = 'ganesa-layout-v1';
+
+  function buildBooth(b) {
+    var t = TYPES[b.type] || CFG.types[0], g = new THREE.Group(), col = new THREE.Color(b.color || t.color);
+    var w = t.w, d = t.d, cm = mat(col.getHex()), pole = mat(0xb8bec2);
+    if (t.stage) {
+      boxB(-w / 2, w / 2, -0.6, t.h, -d / 2, d / 2, mat(0x2c3236), g);
+      boxB(-w / 2, w / 2, t.h, t.h + 0.05, -d / 2, d / 2, cm, g);
+      boxB(-w / 2, w / 2, t.h, t.h + 3.2, -d / 2, -d / 2 + 0.1, mat(0xf4f5f2), g);
+      g.userData.slot = addSlot(g, w - 0.2, 3.0, 0, t.h + 1.6, -d / 2 + 0.11);
+    } else if (t.table) {
+      boxB(-w / 2, w / 2, t.h - 0.04, t.h, -d / 2, d / 2, mat(0xf6f6f2), g);
+      boxB(-w / 2, w / 2, 0, t.h - 0.04, d / 2 - 0.02, d / 2, cm, g);
+    } else if (t.banner) {
+      boxB(-w / 2, -w / 2 + 0.12, -0.3, t.h, -0.06, 0.06, pole, g); boxB(w / 2 - 0.12, w / 2, -0.3, t.h, -0.06, 0.06, pole, g);
+      boxB(-w / 2, w / 2, t.h - 1.0, t.h, -0.03, 0.03, cm, g);
+      g.userData.slot = addSlot(g, w - 0.3, 0.95, 0, t.h - 0.5, 0.04);
+    } else {
+      [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(function (s) { boxB(s[0] * w / 2 - 0.04, s[0] * w / 2 + 0.04, -0.3, t.h, s[1] * d / 2 - 0.04, s[1] * d / 2 + 0.04, pole, g); });
+      var rm = new THREE.MeshLambertMaterial({ color: col, side: THREE.DoubleSide });
+      var top = t.h + 0.9, y = t.h;
+      quad([-w / 2, y, -d / 2], [w / 2, y, -d / 2], [w / 4, top, 0], [-w / 4, top, 0], rm, g);
+      quad([-w / 2, y, d / 2], [w / 2, y, d / 2], [w / 4, top, 0], [-w / 4, top, 0], rm, g);
+      tri([-w / 2, y, -d / 2], [-w / 4, top, 0], [-w / 2, y, d / 2], rm, g);
+      tri([w / 2, y, -d / 2], [w / 4, top, 0], [w / 2, y, d / 2], rm, g);
+      boxB(-w / 2, w / 2, y - 0.25, y, d / 2 - 0.02, d / 2 + 0.02, cm, g);
+      boxB(-w / 2, w / 2, 0, t.h, -d / 2 - 0.03, -d / 2 + 0.03, mat(0xf4f5f2), g);
+      g.userData.slot = addSlot(g, w - 0.2, t.h - 0.4, 0, t.h / 2 + 0.1, -d / 2 + 0.04);
+      boxB(-Math.min(1.2, w / 2 - 0.2), Math.min(1.2, w / 2 - 0.2), 0.71, 0.75, d / 2 - 0.9, d / 2 - 0.3, mat(0xf6f6f2), g);
+      boxB(-Math.min(1.2, w / 2 - 0.2), Math.min(1.2, w / 2 - 0.2), 0, 0.71, d / 2 - 0.32, d / 2 - 0.3, cm, g);
+    }
+    var hit = new THREE.Mesh(new THREE.BoxGeometry(w, Math.max(t.h, 0.5) + 1, Math.max(d, 0.6)), new THREE.MeshBasicMaterial({ visible: false }));
+    hit.position.y = (Math.max(t.h, 0.5) + 1) / 2; g.add(hit);
+    var ring = new THREE.Mesh(new THREE.PlaneGeometry(w + 1, d + 1), new THREE.MeshBasicMaterial({ color: 0x1f5f8b, transparent: true, opacity: 0.35 }));
+    ring.rotation.x = -Math.PI / 2; ring.position.y = 0.3; ring.visible = false; g.add(ring);
+    g.userData.ring = ring; g.userData.hit = hit; hit.userData.booth = b;
+    var lb = makeTag(b.name || t.name); lb.position.set(0, Math.max(t.h, 1) + 2.2, 0); g.add(lb); g.userData.tag = lb;
+    g.position.set(b.x, hy(b.x, b.z), b.z); g.rotation.y = b.rot || 0;
+    G.booths.add(g); b.obj = g;
+    if (b.img) applyImg(g.userData.slot, b.img);
+    return g;
+  }
+  function makeTag(text) {
+    var fs = 36, pad = 10, c = document.createElement('canvas'), g = c.getContext('2d');
+    g.font = '600 ' + fs + 'px system-ui,sans-serif';
+    var w = Math.ceil(g.measureText(text).width) + pad * 2, h = fs + pad * 1.4; c.width = w; c.height = h;
+    g.font = '600 ' + fs + 'px system-ui,sans-serif'; g.fillStyle = 'rgba(255,255,255,0.95)'; g.fillRect(0, 0, w, h);
+    g.fillStyle = '#1b2226'; g.textBaseline = 'middle'; g.fillText(text, pad, h / 2 + 1);
+    var s = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), depthTest: false }));
+    s.scale.set(1.1 * w / h, 1.1, 1); s.renderOrder = 21; s.userData.maxD = 160; labels.push(s); return s;
+  }
+  function addSlot(g, w, h, x, y, z) {
+    var m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshLambertMaterial({ color: 0xf4f5f2 }));
+    m.position.set(x, y, z); m.userData.aspect = w / h; g.add(m); return m;
+  }
+  function applyImg(m, url) {
+    if (!m) return;
+    var img = new Image();
+    img.onload = function () {
+      var tex = new THREE.Texture(img); tex.needsUpdate = true;
+      var ia = img.width / img.height, sa = m.userData.aspect;
+      if (ia > sa) { tex.repeat.set(sa / ia, 1); tex.offset.set((1 - sa / ia) / 2, 0); }
+      else { tex.repeat.set(1, ia / sa); tex.offset.set(0, (1 - ia / sa) / 2); }
+      m.material = new THREE.MeshBasicMaterial({ map: tex });
+    };
+    img.src = url;
+  }
+  function removeObj(b) {
+    if (!b.obj) return;
+    var i = labels.indexOf(b.obj.userData.tag); if (i >= 0) labels.splice(i, 1);
+    G.booths.remove(b.obj); b.obj = null;
+  }
+  function save() { try { localStorage.setItem(LS_KEY, JSON.stringify(serial())); } catch (e) {} }
+  function serial() {
+    return booths.map(function (b) {
+      var o = { type: b.type, name: b.name, x: Math.round(b.x * 10) / 10, z: Math.round(b.z * 10) / 10, rot: Math.round((b.rot || 0) * 1000) / 1000 };
+      if (b.color) o.color = b.color; return o;
+    });
+  }
+  function load(arr) {
+    booths.forEach(removeObj); booths = []; selectB(null);
+    (arr || []).forEach(function (o) { if (!TYPES[o.type]) return; var b = { id: uid++, type: o.type, name: o.name || '', x: +o.x, z: +o.z, rot: +o.rot || 0, color: o.color }; booths.push(b); buildBooth(b); });
+    renderList();
+  }
+  function snapAngle(x, z) {
+    var ns = nearestSeg(x, z, 18);
+    if (!ns) return 0;
+    var a = -ns.ang, fx = Math.sin(a), fz = Math.cos(a), tx = ns.px - x, tz = ns.pz - z;
+    if (fx * tx + fz * tz < 0) a += Math.PI;
+    return a;
+  }
+  function placeAt(x, z) {
+    var t = TYPES[sel.value];
+    var b = { id: uid++, type: t.id, name: document.getElementById('inName').value.trim(), x: x, z: z, rot: snapAngle(x, z) };
+    booths.push(b); buildBooth(b); selectB(b); renderList(); save();
+  }
+  function selectB(b) {
+    if (selected && selected.obj) selected.obj.userData.ring.visible = false;
+    selected = b;
+    if (b && b.obj) b.obj.userData.ring.visible = true;
+    document.getElementById('selBox').style.display = b ? 'block' : 'none';
+    if (b) {
+      document.getElementById('selTitle').textContent = 'Terpilih: ' + (b.name || TYPES[b.type].name);
+      var sp = slopeAt(b.x, b.z).p, t = TYPES[b.type], drop = sp / 100 * Math.max(t.w, t.d);
+      document.getElementById('selSlope').innerHTML = 'Elevasi ±' + fmt(elevAbs(b.x, b.z), 1) + ' m dpl · kemiringan tanah <span class="' + slopeCls(sp) + '">' + pct(sp) + '</span> · beda tinggi di tapak ±' + fmt(drop, 2) + ' m' + (sp >= 5 ? ' — perlu ganjal/leveling kaki tenda' : '');
+    }
+    renderList();
+  }
+  function rebuild(b) { removeObj(b); buildBooth(b); if (selected === b) b.obj.userData.ring.visible = true; }
+  function renderList() {
+    var ul = document.getElementById('list'); ul.innerHTML = '';
+    var count = {};
+    booths.forEach(function (b) {
+      var t = TYPES[b.type]; count[t.name] = (count[t.name] || 0) + 1;
+      var li = document.createElement('li'); if (b === selected) li.className = 'sel';
+      var sp = slopeAt(b.x, b.z).p;
+      li.innerHTML = '<i style="background:' + (b.color || t.color) + '"></i><span></span><em></em>';
+      li.querySelector('span').textContent = b.name || t.name; li.querySelector('em').innerHTML = t.w + '×' + t.d + ' · <b class="' + slopeCls(sp) + '">' + pct(sp) + '</b>';
+      li.onclick = function () { selectB(b); flyTo(b.x, b.z); };
+      ul.appendChild(li);
+    });
+    var area = booths.reduce(function (s, b) { var t = TYPES[b.type]; return s + t.w * t.d; }, 0);
+    document.getElementById('stats').textContent = booths.length ? (booths.length + ' objek · ' + Object.keys(count).map(function (k) { return count[k] + '× ' + k; }).join(', ') + ' · total tapak ±' + fmt(area) + ' m²') : 'Belum ada booth.';
+  }
+
+  /* ---------- kamera ---------- */
+  var target = new THREE.Vector3(-20, 0, 20);
+  var st = { th: 0.25, ph: 0.95, r: 520 };
+  var isTop = false;
+  function setCam() {
+    var sp = Math.sin(st.ph);
+    camera.position.set(target.x + st.r * sp * Math.sin(st.th), target.y + st.r * Math.cos(st.ph), target.z + st.r * sp * Math.cos(st.th));
+    camera.up.set(0, 1, 0); if (isTop) camera.up.set(0, 0, -1);
+    camera.lookAt(target);
+  }
+  function lookFrom(pos, tgt) {
+    target.set(tgt[0], tgt[1], tgt[2]);
+    var dx = pos[0] - tgt[0], dy = pos[1] - tgt[1], dz = pos[2] - tgt[2];
+    st.r = Math.sqrt(dx * dx + dy * dy + dz * dz); st.ph = Math.acos(dy / st.r); st.th = Math.atan2(dx, dz);
+  }
+  function eye(x, z, up) { return hy(x, z) + up; }
+  var VIEWS = {
+    overview:  function () { target.set(-20, 0, 20); st.th = 0.25; st.ph = 0.95; st.r = 520; return { fov: 50 }; },
+    top:       function () { target.set(10, 0, -50); st.th = 0; st.ph = 0.0001; st.r = 1150; return { fov: 50, top: true }; },
+    labtek5:   function () { lookFrom([-40, eye(-40, 95, 38), 95], [-79, eye(-79, 10, 6), 10]); return { fov: 55 }; },
+    gerbang:   function () { lookFrom([-8, eye(-8, 330, 6), 330], [-8, eye(-8, 150, 6), 150]); return { fov: 62 }; },
+    boulevard: function () { lookFrom([-8, eye(-8, 175, 1.7), 175], [-8, eye(-8, 20, 7), 20]); return { fov: 62 }; },
+    jalan2:    function () { lookFrom([-60, eye(-60, 90, 14), 90], [-150, eye(-150, 55, 3), 55]); return { fov: 60 }; }
+  };
+  function go(name) {
+    var o = VIEWS[name](); isTop = !!o.top; camera.fov = o.fov; camera.updateProjectionMatrix(); setCam();
+    document.querySelectorAll('header [data-view]').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-view') === name); });
+  }
+  function flyTo(x, z) { target.set(x, hy(x, z), z); st.r = Math.min(st.r, 60); st.ph = Math.min(st.ph, 1.1); isTop = false; setCam(); clearViewBtns(); }
+  document.querySelectorAll('[data-view]').forEach(function (b) { b.addEventListener('click', function () { go(b.getAttribute('data-view')); }); });
+  function resize() { var w = stage.clientWidth, h = stage.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / Math.max(h, 1); camera.updateProjectionMatrix(); }
+  window.addEventListener('resize', resize); resize();
+  var h0 = (location.hash || '').slice(1); go(VIEWS[h0] ? h0 : 'overview');
+  window.addEventListener('hashchange', function () { var h = location.hash.slice(1); if (VIEWS[h]) go(h); });
+
+  /* ---------- kontrol ---------- */
+  var el = renderer.domElement, ptrs = {}, moved = 0, last = null, pinch = 0;
+  function clearViewBtns() { document.querySelectorAll('header [data-view]').forEach(function (b) { b.classList.remove('on'); }); }
+  el.addEventListener('pointerdown', function (e) {
+    try { el.setPointerCapture(e.pointerId); } catch (x) {}
+    ptrs[e.pointerId] = { x: e.clientX, y: e.clientY }; moved = 0; last = { x: e.clientX, y: e.clientY };
+    var ids = Object.keys(ptrs); if (ids.length === 2) { var a = ptrs[ids[0]], b = ptrs[ids[1]]; pinch = Math.hypot(a.x - b.x, a.y - b.y); }
+  });
+  el.addEventListener('pointermove', function (e) {
+    if (!ptrs[e.pointerId]) return;
+    ptrs[e.pointerId] = { x: e.clientX, y: e.clientY };
+    var ids = Object.keys(ptrs);
+    if (ids.length === 2) {
+      var a = ptrs[ids[0]], b = ptrs[ids[1]], d = Math.hypot(a.x - b.x, a.y - b.y);
+      if (pinch && d) st.r = Math.min(1400, Math.max(4, st.r * pinch / d)); pinch = d; moved += 10; setCam(); return;
+    }
+    var dx = e.clientX - last.x, dy = e.clientY - last.y; last = { x: e.clientX, y: e.clientY };
+    moved += Math.abs(dx) + Math.abs(dy);
+    if (moved < 4) return;
+    var k = st.r * 0.0015;
+    if (e.shiftKey || e.buttons === 2 || isTop) {
+      var right = new THREE.Vector3().setFromMatrixColumn(camera.matrix, 0); right.y = 0; right.normalize();
+      var fwd = isTop ? new THREE.Vector3(0, 0, -1) : new THREE.Vector3(-Math.sin(st.th), 0, -Math.cos(st.th));
+      target.addScaledVector(right, -dx * k).addScaledVector(fwd, dy * k);
+      target.y = hy(target.x, target.z);
+    } else { st.th -= dx * 0.006; st.ph = Math.min(1.55, Math.max(0.05, st.ph - dy * 0.006)); }
+    clearViewBtns(); setCam();
+  });
+  el.addEventListener('pointerup', function (e) { delete ptrs[e.pointerId]; pinch = 0; if (!Object.keys(ptrs).length && moved < 4) click(e); });
+  el.addEventListener('pointercancel', function (e) { delete ptrs[e.pointerId]; pinch = 0; });
+  el.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+  el.addEventListener('wheel', function (e) { e.preventDefault(); st.r = Math.min(1400, Math.max(4, st.r * (1 + Math.sign(e.deltaY) * 0.08))); setCam(); }, { passive: false });
+
+  var ray = new THREE.Raycaster(), info = document.getElementById('info'), hint = document.getElementById('hint');
+  var baseHint = hint.textContent;
+  function setRay(e) { var r = el.getBoundingClientRect(); ray.setFromCamera(new THREE.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1), camera); }
+  function groundPoint() { var hit = ray.intersectObject(ground, false)[0]; return hit ? hit.point : null; }
+  var mPts = [];
+  function click(e) {
+    setRay(e);
+    if (mode === 'place' || mode === 'move') {
+      var p = groundPoint(); if (!p) return;
+      if (mode === 'place') placeAt(p.x, p.z);
+      else if (selected) { selected.x = p.x; selected.z = p.z; selected.rot = snapAngle(p.x, p.z); rebuild(selected); selectB(selected); save(); }
+      setMode(null); return;
+    }
+    if (mode === 'measure') { var q = groundPoint(); if (!q) return; mPts.push(q.clone()); drawMeasure(); return; }
+    if (mode === 'gate') {
+      var gq = groundPoint(); if (!gq || placingGate < 0) return;
+      var gg = REF.gates[placingGate]; gg.x = Math.round(gq.x * 10) / 10; gg.z = Math.round(gq.z * 10) / 10; gg.userSet = true;
+      gatePos[gg.name] = [gg.x, gg.z]; try { localStorage.setItem(GK, JSON.stringify(gatePos)); } catch (e) {}
+      placingGate = -1; setMode(null); buildGates(); renderGates(); return;
+    }
+    var gh = ray.intersectObjects(REFG.gates.children.filter(function (o) { return o.isGroup; }).map(function (o) { return o.children[o.children.length - 1]; }), false)[0];
+    if (gh) { var G2 = REF.gates[gh.object.userData.gate]; info.style.display = 'block';
+      info.innerHTML = '<b>' + G2.name + '</b><br>Status: ' + (G2.live ? '<span class="ok">fungsional</span>' : '<span class="bad">non-fungsional</span>') + '<br>Jam ' + G2.hours + ' · ' + G2.fn + ' · akses ' + G2.acc +
+        '<br>Elevasi ±' + fmt(elevAbs(G2.x, G2.z), 1) + ' m dpl'; return; }
+    if (REFG.hm.visible) { var hh = ray.intersectObjects(REFG.hm.children, false)[0];
+      if (hh && hh.object.userData.hm) { var H2 = hh.object.userData.hm; info.style.display = 'block'; info.innerHTML = '<b>' + H2.n + '</b><br>' + H2.loc + '<br><span style="color:#5b666c">Peta HMPS Capanlap AMI 2026</span>'; return; } }
+    var hits = ray.intersectObjects(booths.map(function (b) { return b.obj && b.obj.userData.hit; }).filter(Boolean), false);
+    if (hits.length) { selectB(hits[0].object.userData.booth); openPanel(true); return; }
+    var sh = G.steps.visible ? ray.intersectObjects(G.steps.children, false)[0] : null;
+    if (sh && sh.object.userData.stepInfo) { info.style.display = 'block'; info.innerHTML = '<b>⚠ Tangga luar</b><br>' + sh.object.userData.stepInfo; return; }
+    var bh = ray.intersectObjects(buildings, false)[0], gp = groundPoint();
+    if (bh && bh.object.userData.name && (!gp || bh.distance <= gp.distanceTo(camera.position) + 0.5)) {
+      var u = bh.object.userData;
+      info.style.display = 'block';
+      info.innerHTML = '<b>' + u.name + '</b>' + (u.osm ? '<br><span style="color:#5b666c">' + u.osm + '</span>' : '') + '<br>' + u.levels + ' lantai (±' + fmt(u.levels * CFG.floorH) + ' m)<br>Lantai dasar ±' + fmt(u.floorAbs, 1) + ' m dpl' +
+        (u.drop > 0.8 ? '<br>Tanah di bawah tapak berbeda ±' + fmt(u.drop, 1) + ' m (kemungkinan ada undakan/plint)' : '');
+    } else if (gp) {
+      var s2 = slopeAt(gp.x, gp.z), ns = nearestSeg(gp.x, gp.z, 8);
+      info.style.display = 'block';
+      info.innerHTML = '<b>Elevasi ±' + fmt(elevAbs(gp.x, gp.z), 1) + ' m dpl</b> (' + (gp.y >= 0 ? '+' : '') + fmt(gp.y, 1) + ' m dari datum)<br>' +
+        'Kemiringan tanah <span class="' + slopeCls(s2.p) + '">' + pct(s2.p) + '</span>' + (s2.p > 1 ? ', menurun ke ' + dirName(s2.gx, s2.gz) : '') +
+        (ns && ns.s ? '<br>Dekat jalan/jalur (±' + fmt(ns.d, 0) + ' m)' : '') +
+        (function () { var t2 = nearestTitik(gp.x, gp.z); return t2 ? '<br>Titik kumpul terdekat ±' + fmt(t2.d, 0) + ' m (garis lurus)' : ''; })() +
+        (gp.z < CFG.elev.dataNorth ? '<br><span class="mid">Area utara: elevasi belum tersedia (disalin dari tepi data)</span>' : '');
+    } else info.style.display = 'none';
+  }
+  function drawMeasure() {
+    while (G.measure.children.length) G.measure.remove(G.measure.children[0]);
+    var total = 0, rise = 0, fall = 0, worst = 0;
+    mPts.forEach(function (p, i) {
+      var dot = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.6, 0.4, 12), mat(0xd62f2f)); dot.position.set(p.x, hy(p.x, p.z) + 0.3, p.z); G.measure.add(dot);
+      if (i) {
+        var a = mPts[i - 1], d = Math.hypot(p.x - a.x, p.z - a.z); total += d;
+        var pr = profileOf([[a.x, a.z], [p.x, p.z]]), stt = gradStats(pr, Math.min(20, Math.max(4, d / 2)));
+        for (var k2 = 1; k2 < pr.length; k2++) { var de = pr[k2].e - pr[k2 - 1].e; if (de > 0) rise += de; else fall -= de; }
+        var dE = pr[pr.length - 1].e - pr[0].e, g = d ? dE / d * 100 : 0;
+        if (Math.abs(stt.max) > Math.abs(worst)) worst = stt.max;
+        var col = Math.abs(stt.max) >= 12 ? 0xb3261e : Math.abs(stt.max) >= 8.33 ? 0xe08a00 : 0x2e7d32;
+        ribbon3([[a.x, a.z], [p.x, p.z]], 0.6, 0.4, mat(col), G.measure);
+        var mx = (a.x + p.x) / 2, mz = (a.z + p.z) / 2;
+        var s = makeTag(fmt(d) + ' m · Δh ' + (dE >= 0 ? '+' : '') + fmt(dE, 1) + ' m · ' + pct(g) + ' (maks ' + pct(stt.max) + ')');
+        s.position.set(mx, hy(mx, mz) + 3, mz); s.userData.maxD = 1e9; s.userData.always = true; G.measure.add(s);
+      }
+    });
+    hint.innerHTML = mPts.length < 2 ? 'Ukur: klik titik-titik di peta (jarak datar, beda tinggi, gradien). Klik "Ukur jarak &amp; gradien" lagi untuk selesai.' :
+      'Total ' + fmt(total) + ' m · naik ' + fmt(rise, 1) + ' m · turun ' + fmt(fall, 1) + ' m · gradien terburuk <b class="' + slopeCls(worst) + '">' + pct(worst) + '</b> (batas ramp kursi roda 8,33%).';
+  }
+  function setMode(m) {
+    mode = m;
+    document.getElementById('bPlace').classList.toggle('on', m === 'place');
+    document.getElementById('bMove').classList.toggle('on', m === 'move');
+    document.getElementById('bMeasure').classList.toggle('on', m === 'measure');
+    if (m === 'place') hint.textContent = 'Klik lokasi di peta untuk menaruh ' + TYPES[sel.value].name + '.';
+    else if (m === 'move') hint.textContent = 'Klik lokasi baru untuk booth terpilih.';
+    else if (m !== 'measure' && m !== 'gate') hint.textContent = baseHint;
+  }
+
+  /* ---------- tombol ---------- */
+  function tog(id, fn, init) { var b = document.getElementById(id), on = init; b.onclick = function () { on = !on; b.classList.toggle('on', on); fn(on); }; }
+  tog('tLabel', function (v) { labelsOn = v; G.labels.visible = v; }, true);
+  tog('tTree', function (v) { G.trees.visible = v; }, true);
+  tog('tRoof', function (v) { G.roofs.visible = v; }, true);
+  tog('tMain', function (v) { G.main.visible = v; }, true);
+  tog('tSteps', function (v) { G.steps.visible = v; }, true);
+  tog('tSlope', function (v) { slopeOn = v; refreshGround(); }, false);
+  tog('tContour', function (v) { contourOn = v; refreshGround(); }, true);
+  tog('tFocus', function (v) {
+    buildings.forEach(function (m) { if (m.userData.base) m.material = v ? [ghostRoof, ghostWall] : m.userData.base; m.children.forEach(function (c) { c.visible = !v; }); });
+    if (v) go('labtek5');
+  }, false);
+  function openPanel(force) {
+    var p = document.getElementById('panel'), open = force || p.style.display !== 'block';
+    p.style.display = open ? 'block' : 'none'; document.getElementById('bBooth').classList.toggle('on', open);
+    if (open) { ['prof', 'facPanel', 'gatePanel'].forEach(function (id) { document.getElementById(id).style.display = 'none'; }); ['bProf', 'bFac', 'bGate'].forEach(function (id) { document.getElementById(id).classList.remove('on'); }); while (G.prof.children.length) G.prof.remove(G.prof.children[0]); }
+    if (!open) setMode(null);
+  }
+  document.getElementById('bBooth').onclick = function () { openPanel(false); };
+  var sidePanels = [['facPanel', 'bFac'], ['gatePanel', 'bGate'], ['prof', 'bProf'], ['panel', 'bBooth']];
+  function showOnly(id) {
+    var was = document.getElementById(id).style.display === 'block';
+    sidePanels.forEach(function (p) { document.getElementById(p[0]).style.display = 'none'; document.getElementById(p[1]).classList.remove('on'); });
+    if (!was) { document.getElementById(id).style.display = 'block'; sidePanels.forEach(function (p) { if (p[0] === id) document.getElementById(p[1]).classList.add('on'); }); }
+    while (G.prof.children.length) G.prof.remove(G.prof.children[0]);
+    if (mode === 'place' || mode === 'move') setMode(null);
+  }
+  document.getElementById('bFac').onclick = function () { showOnly('facPanel'); };
+  document.getElementById('bGate').onclick = function () { showOnly('gatePanel'); };
+  tog('tHm', function (v) { REFG.hm.visible = v; }, false);
+  tog('tPhoto', function (v) { photoOn = v; refreshGround(); }, true);
+  document.getElementById('bProf').onclick = function () {
+    var p = document.getElementById('prof'), open = p.style.display !== 'block';
+    p.style.display = open ? 'block' : 'none'; this.classList.toggle('on', open);
+    if (open) { ['panel', 'facPanel', 'gatePanel'].forEach(function (id) { document.getElementById(id).style.display = 'none'; }); ['bBooth', 'bFac', 'bGate'].forEach(function (id) { document.getElementById(id).classList.remove('on'); }); showProfile(selRoad.value); }
+    else while (G.prof.children.length) G.prof.remove(G.prof.children[0]);
+  };
+  document.getElementById('bPlace').onclick = function () { setMode(mode === 'place' ? null : 'place'); };
+  document.getElementById('bMeasure').onclick = function () {
+    if (mode === 'measure') { setMode(null); mPts = []; while (G.measure.children.length) G.measure.remove(G.measure.children[0]); }
+    else { setMode('measure'); mPts = []; drawMeasure(); }
+  };
+  document.getElementById('bMove').onclick = function () { if (selected) setMode(mode === 'move' ? null : 'move'); };
+  document.getElementById('bRotL').onclick = function () { if (!selected) return; selected.rot = (selected.rot || 0) + Math.PI / 12; selected.obj.rotation.y = selected.rot; save(); };
+  document.getElementById('bRotR').onclick = function () { if (!selected) return; selected.rot = (selected.rot || 0) - Math.PI / 12; selected.obj.rotation.y = selected.rot; save(); };
+  document.getElementById('bDel').onclick = function () { if (!selected) return; removeObj(selected); booths.splice(booths.indexOf(selected), 1); selectB(null); save(); };
+  var fileOne = document.getElementById('fileOne');
+  document.getElementById('bImg').onclick = function () { if (selected) { fileOne.value = ''; fileOne.click(); } };
+  fileOne.addEventListener('change', function () {
+    var f = fileOne.files[0]; if (!f || !selected) return; var b = selected;
+    var rd = new FileReader(); rd.onload = function () { b.img = rd.result; applyImg(b.obj.userData.slot, b.img); }; rd.readAsDataURL(f);
+  });
+  var io = document.getElementById('ioText');
+  document.getElementById('bCopy').onclick = function () {
+    var txt = JSON.stringify(serial()); io.style.display = 'block'; io.value = txt; io.select();
+    try { navigator.clipboard.writeText(txt).then(function () { document.getElementById('bCopy').textContent = 'Tersalin ✓'; setTimeout(function () { document.getElementById('bCopy').textContent = 'Salin data (JSON)'; }, 1500); }, function () {}); } catch (e) {}
+  };
+  document.getElementById('bLoad').onclick = function () {
+    if (io.style.display !== 'block' || !io.value.trim()) { io.style.display = 'block'; io.value = ''; io.focus(); return; }
+    try { load(JSON.parse(io.value)); save(); io.style.display = 'none'; } catch (e) { io.value = 'Format JSON tidak valid.\n' + io.value; }
+  };
+  var clearArm = 0;
+  document.getElementById('bClearAll').onclick = function () {
+    var b = this;
+    if (Date.now() - clearArm > 3000) { clearArm = Date.now(); b.textContent = 'Klik lagi untuk yakin'; setTimeout(function () { b.textContent = 'Kosongkan'; }, 3000); return; }
+    load([]); save(); b.textContent = 'Kosongkan';
+  };
+  sel.onchange = function () { if (mode === 'place') setMode('place'); };
+
+  try { var saved = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); if (saved) load(saved); else renderList(); } catch (e) { renderList(); }
+
+  /* ---------- loop ---------- */
+  var tmp = new THREE.Vector3();
+  (function loop() {
+    requestAnimationFrame(loop);
+    for (var i = 0; i < labels.length; i++) {
+      var s = labels[i]; s.getWorldPosition(tmp);
+      var d = tmp.distanceTo(camera.position);
+      s.visible = (labelsOn || s.userData.always) && d < s.userData.maxD;
+      var f = Math.min(2.2, Math.max(0.35, d / 160)); if (!s.userData.s0) s.userData.s0 = s.scale.clone();
+      s.scale.set(s.userData.s0.x * f, s.userData.s0.y * f, 1);
+    }
+    G.steps.children.forEach(function (c) { if (c.userData.lookCam) { c.rotation.set(Math.PI / 2, 0, 0); c.lookAt(camera.position.x, c.position.y, camera.position.z); c.rotateX(Math.PI / 2); } });
+    renderer.render(scene, camera);
+  })();
+  window.__scene = scene; window.__dbg = { elevAbs: elevAbs, H0: H0, slopeAt: slopeAt, roadByName: roadByName, profileOf: profileOf, gradStats: gradStats, L5: L5fb, go: go };
+})();
+</script>
+</body>
+</html>
